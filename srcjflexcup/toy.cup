@@ -1,0 +1,107 @@
+init with {: Node<String> root = new Node("ProgramOp"); :}
+
+nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IsListInit, Proc, ResultTypeList, ReturnExprs, ExprList,
+    ParamDeclList, ParDecl, IdList, ResultType, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat, ReadlnStat,
+    WriteStat, AssignStat, CallProc, Expr;
+
+terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
+    WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
+    NOT, GT, GE, NE, LT, LE, EQ;
+
+terminal String ID, STRING_CONST;
+terminal int INT_CONST;
+terminal Double FLOAT_CONST;
+
+Program ::= VarDeclList ProcList
+
+VarDeclList ::=
+/* empty */
+| VardDecl VarDeclList
+
+ProcList ::= Proc
+	| Proc ProcList
+
+VarDecl ::= Type IdListInit SEMI
+
+Type ::= INT | BOOL | FLOAT | STRING
+
+IdListInit ::= ID
+	| IdListInit COMMA ID
+	| ID ASSIGN Expr
+	| IdListInit COMMA ID ASSIGN Expr
+
+Proc ::= PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
+		VarDeclList StatList ReturnExprs CORP SEMI
+	| PROC ID LPAR RPAR ResultTypeList COLON
+		VarDeclList StatList ReturnExprs CORP SEMI
+
+ResultTypeList ::= ResultType
+	| ResultType COMMA ResultTypeList
+
+ReturnExprs::=  ExprList
+	| /* empty */
+
+ExprList ::= Expr
+	| Expr COMMA ExprList
+
+ParamDeclList ::= ParDecl | ParamDeclList SEMI ParDecl
+
+ParDecl ::= Type IdList
+
+IdList ::= ID | IdList COMMA ID
+
+ResultType ::= Type | VOID
+
+StatList ::= Stat  | Stat StatList
+
+Stat ::= IfStat SEMI
+	| WhileStat SEMI
+	| ReadlnStat SEMI
+	| WriteStat SEMI
+	| AssignStat SEMI
+	| CallProc SEMI
+	| /* empty */
+
+IfStat ::= IF Expr THEN StatList ElifList Else FI
+
+ElifList ::= /* empty */
+	| Elif ElifList
+
+Elif ::= ELIF Expr THEN StatList
+
+Else ::= /* empty */ | ELSE StatList
+
+WhileStat ::= WHILE StatList Expr DO StatList OD
+	| WHILE Expr DO StatList OD
+
+ReadlnStat ::= READ LPAR IdList RPAR
+
+WriteStat ::=  WRITE LPAR ExprList RPAR
+
+AssignStat ::= IdList ASSIGN  ExprList
+
+CallProc ::= ID LPAR ExprList RPAR
+	| ID LPAR RPAR
+
+Expr ::= NULL
+	| TRUE
+	| FALSE
+	| INT_CONST
+	| FLOAT_CONST
+	| STRING_CONST
+	| ID
+    | CallProc
+	| Expr  PLUS Expr
+	| Expr  MINUS Expr
+	| Expr  TIMES Expr
+	| Expr  DIV Expr
+	| Expr  AND Expr
+	| Expr  OR Expr
+	| Expr  GT Expr
+	| Expr  GE Expr
+	| Expr  LT Expr
+	| Expr  LE Expr
+	| Expr  EQ Expr
+	| Expr  NE Expr
+	| MINUS Expr
+	| NOT Expr
