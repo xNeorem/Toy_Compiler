@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+        <isFinal>false</isFinal>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -47,6 +48,9 @@
                     <cupDefinition>srcjflexcup/toy.cup</cupDefinition>
                     <outputDirectory>src/main/java</outputDirectory>
                     <packageName>it.esercitazione4</packageName>
+                    <dumpGrammar>${isFinal}</dumpGrammar>
+                    <dumpStates>${isFinal}</dumpStates>
+                    <dumpTables>${isFinal}</dumpTables>
                 </configuration>
             </plugin>
             <plugin>
