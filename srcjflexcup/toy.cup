@@ -11,11 +11,18 @@ nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IdListInit, Proc, Res
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
-    NOT, GT, GE, NE, LT, LE, EQ;
+    NOT, GT, GE, NE, LT, LE, EQ, UMINUS;
 
 terminal String ID, STRING_CONST;
 terminal int INT_CONST;
 terminal Double FLOAT_CONST;
+
+precedence left AND, OR;
+precedence left GT, GE, NE, LT, LE, EQ;
+precedence left NOT;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV;
+precedence left UMINUS;
 
 Program ::= VarDeclList ProcList {: RESULT = 0;  :};
 
@@ -64,16 +71,17 @@ IdList ::= ID {: RESULT = 0;  :}
 ResultType ::= Type {: RESULT = 0;  :}
     | VOID {: RESULT = 0;  :}
 ;
-StatList ::= Stat  {: RESULT = 0;  :}
-    | Stat StatList {: RESULT = 0;  :}
+StatList ::= Stat SEMI {: RESULT = 0;  :}
+    | Stat SEMI StatList {: RESULT = 0;  :}
+    | /* empty NUOVA*/ {: RESULT = 0;  :}
 ;
-Stat ::= IfStat SEMI {: RESULT = 0;  :}
-	| WhileStat SEMI {: RESULT = 0;  :}
-	| ReadlnStat SEMI {: RESULT = 0;  :}
-	| WriteStat SEMI {: RESULT = 0;  :}
-	| AssignStat SEMI {: RESULT = 0;  :}
-	| CallProc SEMI {: RESULT = 0;  :}
-	| /* empty */ {: RESULT = 0;  :}
+Stat ::= IfStat {: RESULT = 0;  :}
+	| WhileStat  {: RESULT = 0;  :}
+	| ReadlnStat {: RESULT = 0;  :}
+	| WriteStat  {: RESULT = 0;  :}
+	| AssignStat  {: RESULT = 0;  :}
+	| CallProc  {: RESULT = 0;  :}
+    /*| /* empty  {: RESULT = 0;  :}*/
 ;
 IfStat ::= IF Expr THEN StatList ElifList Else FI {: RESULT = 0;  :}
 ;
@@ -86,7 +94,7 @@ Else ::= /* empty */ {: RESULT = 0;  :}
     | ELSE StatList {: RESULT = 0;  :}
 ;
 WhileStat ::= WHILE StatList Expr DO StatList OD {: RESULT = 0;  :}
-	| WHILE Expr DO StatList OD {: RESULT = 0;  :}
+/*|  WHILE Expr DO StatList OD {: RESULT = 0;  :}*/
 ;
 ReadlnStat ::= READ LPAR IdList RPAR {: RESULT = 0;  :}
 ;
@@ -117,6 +125,6 @@ Expr ::= NULL {: RESULT = 0;  :}
 	| Expr  LE Expr {: RESULT = 0;  :}
 	| Expr  EQ Expr {: RESULT = 0;  :}
 	| Expr  NE Expr {: RESULT = 0;  :}
-	| MINUS Expr {: RESULT = 0;  :}
+	| MINUS Expr {: RESULT = 0;  :} %prec UMINUS
 	| NOT Expr {: RESULT = 0;  :}
 ;
