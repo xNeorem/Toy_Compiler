@@ -1,3 +1,8 @@
+package it.esercitazione4;
+
+import it.esercitazione4.Node;
+import java_cup.runtime.*;
+
 init with {: Node<String> root = new Node("ProgramOp"); :}
 
 nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IsListInit, Proc, ResultTypeList, ReturnExprs, ExprList,
@@ -12,96 +17,106 @@ terminal String ID, STRING_CONST;
 terminal int INT_CONST;
 terminal Double FLOAT_CONST;
 
-Program ::= VarDeclList ProcList
+Program ::= VarDeclList ProcList {: RESULT = 0;  :}
 
 VarDeclList ::=
-/* empty */
-| VardDecl VarDeclList
+/* empty */ {: RESULT = 0;  :}
+| VardDecl VarDeclList {: RESULT = 0;  :}
+;
 
-ProcList ::= Proc
-	| Proc ProcList
-
-VarDecl ::= Type IdListInit SEMI
-
-Type ::= INT | BOOL | FLOAT | STRING
-
-IdListInit ::= ID
-	| IdListInit COMMA ID
-	| ID ASSIGN Expr
-	| IdListInit COMMA ID ASSIGN Expr
-
+ProcList ::= Proc {: RESULT = 0;  :}
+	| Proc ProcList {: RESULT = 0;  :}
+;
+VarDecl ::= Type IdListInit SEMI {: RESULT = 0;  :}
+;
+Type ::= INT {: RESULT = 0;  :}
+    | BOOL {: RESULT = 0;  :}
+    | FLOAT {: RESULT = 0;  :}
+    | STRING {: RESULT = 0;  :}
+;
+IdListInit ::= ID {: RESULT = 0;  :}
+	| IdListInit COMMA ID {: RESULT = 0;  :}
+	| ID ASSIGN Expr {: RESULT = 0;  :}
+	| IdListInit COMMA ID ASSIGN Expr {: RESULT = 0;  :}
+;
 Proc ::= PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
-		VarDeclList StatList ReturnExprs CORP SEMI
+		VarDeclList StatList ReturnExprs CORP SEMI {: RESULT = 0;  :}
 	| PROC ID LPAR RPAR ResultTypeList COLON
-		VarDeclList StatList ReturnExprs CORP SEMI
-
-ResultTypeList ::= ResultType
-	| ResultType COMMA ResultTypeList
-
-ReturnExprs::=  ExprList
-	| /* empty */
-
-ExprList ::= Expr
-	| Expr COMMA ExprList
-
-ParamDeclList ::= ParDecl | ParamDeclList SEMI ParDecl
-
-ParDecl ::= Type IdList
-
-IdList ::= ID | IdList COMMA ID
-
-ResultType ::= Type | VOID
-
-StatList ::= Stat  | Stat StatList
-
-Stat ::= IfStat SEMI
-	| WhileStat SEMI
-	| ReadlnStat SEMI
-	| WriteStat SEMI
-	| AssignStat SEMI
-	| CallProc SEMI
-	| /* empty */
-
-IfStat ::= IF Expr THEN StatList ElifList Else FI
-
-ElifList ::= /* empty */
-	| Elif ElifList
-
-Elif ::= ELIF Expr THEN StatList
-
-Else ::= /* empty */ | ELSE StatList
-
-WhileStat ::= WHILE StatList Expr DO StatList OD
-	| WHILE Expr DO StatList OD
-
-ReadlnStat ::= READ LPAR IdList RPAR
-
-WriteStat ::=  WRITE LPAR ExprList RPAR
-
-AssignStat ::= IdList ASSIGN  ExprList
-
-CallProc ::= ID LPAR ExprList RPAR
-	| ID LPAR RPAR
-
-Expr ::= NULL
-	| TRUE
-	| FALSE
-	| INT_CONST
-	| FLOAT_CONST
-	| STRING_CONST
-	| ID
-    | CallProc
-	| Expr  PLUS Expr
-	| Expr  MINUS Expr
-	| Expr  TIMES Expr
-	| Expr  DIV Expr
-	| Expr  AND Expr
-	| Expr  OR Expr
-	| Expr  GT Expr
-	| Expr  GE Expr
-	| Expr  LT Expr
-	| Expr  LE Expr
-	| Expr  EQ Expr
-	| Expr  NE Expr
-	| MINUS Expr
-	| NOT Expr
+		VarDeclList StatList ReturnExprs CORP SEMI {: RESULT = 0;  :}
+;
+ResultTypeList ::= ResultType {: RESULT = 0;  :}
+	| ResultType COMMA ResultTypeList {: RESULT = 0;  :}
+;
+ReturnExprs::=  ExprList {: RESULT = 0;  :}
+	| /* empty */ {: RESULT = 0;  :}
+;
+ExprList ::= Expr {: RESULT = 0;  :}
+	| Expr COMMA ExprList {: RESULT = 0;  :}
+;
+ParamDeclList ::= ParDecl {: RESULT = 0;  :}
+    | ParamDeclList SEMI ParDecl {: RESULT = 0;  :}
+;
+ParDecl ::= Type IdList {: RESULT = 0;  :}
+;
+IdList ::= ID {: RESULT = 0;  :}
+    | IdList COMMA ID {: RESULT = 0;  :}
+;
+ResultType ::= Type {: RESULT = 0;  :}
+    | VOID {: RESULT = 0;  :}
+;
+StatList ::= Stat  {: RESULT = 0;  :}
+    | Stat StatList {: RESULT = 0;  :}
+;
+Stat ::= IfStat SEMI {: RESULT = 0;  :}
+	| WhileStat SEMI {: RESULT = 0;  :}
+	| ReadlnStat SEMI {: RESULT = 0;  :}
+	| WriteStat SEMI {: RESULT = 0;  :}
+	| AssignStat SEMI {: RESULT = 0;  :}
+	| CallProc SEMI {: RESULT = 0;  :}
+	| /* empty */ {: RESULT = 0;  :}
+;
+IfStat ::= IF Expr THEN StatList ElifList Else FI {: RESULT = 0;  :}
+;
+ElifList ::= /* empty */ {: RESULT = 0;  :}
+	| Elif ElifList {: RESULT = 0;  :}
+;
+Elif ::= ELIF Expr THEN StatList {: RESULT = 0;  :}
+;
+Else ::= /* empty */ {: RESULT = 0;  :}
+    | ELSE StatList {: RESULT = 0;  :}
+;
+WhileStat ::= WHILE StatList Expr DO StatList OD {: RESULT = 0;  :}
+	| WHILE Expr DO StatList OD {: RESULT = 0;  :}
+;
+ReadlnStat ::= READ LPAR IdList RPAR {: RESULT = 0;  :}
+;
+WriteStat ::=  WRITE LPAR ExprList RPAR {: RESULT = 0;  :}
+;
+AssignStat ::= IdList ASSIGN  ExprList {: RESULT = 0;  :}
+;
+CallProc ::= ID LPAR ExprList RPAR {: RESULT = 0;  :}
+	| ID LPAR RPAR {: RESULT = 0;  :}
+;
+Expr ::= NULL {: RESULT = 0;  :}
+	| TRUE {: RESULT = 0;  :}
+	| FALSE {: RESULT = 0;  :}
+	| INT_CONST {: RESULT = 0;  :}
+	| FLOAT_CONST {: RESULT = 0;  :}
+	| STRING_CONST {: RESULT = 0;  :}
+	| ID {: RESULT = 0;  :}
+    | CallProc {: RESULT = 0;  :}
+	| Expr  PLUS Expr {: RESULT = 0;  :}
+	| Expr  MINUS Expr {: RESULT = 0;  :}
+	| Expr  TIMES Expr {: RESULT = 0;  :}
+	| Expr  DIV Expr {: RESULT = 0;  :}
+	| Expr  AND Expr {: RESULT = 0;  :}
+	| Expr  OR Expr {: RESULT = 0;  :}
+	| Expr  GT Expr {: RESULT = 0;  :}
+	| Expr  GE Expr {: RESULT = 0;  :}
+	| Expr  LT Expr {: RESULT = 0;  :}
+	| Expr  LE Expr {: RESULT = 0;  :}
+	| Expr  EQ Expr {: RESULT = 0;  :}
+	| Expr  NE Expr {: RESULT = 0;  :}
+	| MINUS Expr {: RESULT = 0;  :}
+	| NOT Expr {: RESULT = 0;  :}
+;
