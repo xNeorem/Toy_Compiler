@@ -5,7 +5,7 @@ import java_cup.runtime.*;
 
 init with {: Node<String> root = new Node("ProgramOp"); :}
 
-nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IsListInit, Proc, ResultTypeList, ReturnExprs, ExprList,
+nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IdListInit, Proc, ResultTypeList, ReturnExprs, ExprList,
     ParamDeclList, ParDecl, IdList, ResultType, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat, ReadlnStat,
     WriteStat, AssignStat, CallProc, Expr;
 
@@ -17,11 +17,11 @@ terminal String ID, STRING_CONST;
 terminal int INT_CONST;
 terminal Double FLOAT_CONST;
 
-Program ::= VarDeclList ProcList {: RESULT = 0;  :}
+Program ::= VarDeclList ProcList {: RESULT = 0;  :};
 
 VarDeclList ::=
 /* empty */ {: RESULT = 0;  :}
-| VardDecl VarDeclList {: RESULT = 0;  :}
+| VarDecl VarDeclList {: RESULT = 0;  :}
 ;
 
 ProcList ::= Proc {: RESULT = 0;  :}
