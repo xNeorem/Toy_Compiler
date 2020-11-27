@@ -3,13 +3,23 @@ package it.esercitazione4;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node<T>{
+public class Node<T> {
     private T data = null;
     private List<Node> children = new ArrayList<>();
     private Node parent = null;
 
     public Node(T data) {
         this.data = data;
+    }
+
+    public Node(T data, Node child) {
+        this.data = data;
+        this.addChild(child);
+    }
+
+    public Node(T data, List<Node> children) {
+        this.data = data;
+        this.addChildren(children);
     }
 
     public void addChild(Node child) {
@@ -23,7 +33,7 @@ public class Node<T>{
     }
 
     public void addChildren(List<Node> children) {
-        for(Node t : children) {
+        for (Node t : children) {
             t.setParent(this);
         }
         this.children.addAll(children);

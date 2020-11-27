@@ -3,6 +3,15 @@ import java_cup.runtime.Symbol;
 %%
 %public
 %cup
+%line
+%char
+%column
+
+%{
+  private void error(String message) {
+    System.out.println("Error at line "+(yyline+1)+", column "+(yycolumn+1)+" : "+message);
+  }
+%}
 
 %unicode
 
@@ -39,6 +48,7 @@ id = [{letter}][{letter}|{digit}]*
 "write" { return new Symbol(sym.WRITE); }
 ":=" { return new Symbol(sym.ASSIGN); }
 "+" { return new Symbol(sym.PLUS); }
+"->" { return new Symbol(sym.RETURN); }
 "-" { return new Symbol(sym.MINUS); }
 "*" { return new Symbol(sym.TIMES); }
 "/" { return new Symbol(sym.DIV); }
@@ -61,5 +71,5 @@ id = [{letter}][{letter}|{digit}]*
 "||" { return new Symbol(sym.OR); }
 "!" { return new Symbol(sym.NOT); }
 <<EOF>> { return new Symbol(sym.EOF); }
-[^] { return new Symbol(sym.ERROR, yytext()); }
+[^] { error("Illegal character <"+ yytext()+">");}
 

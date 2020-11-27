@@ -11,7 +11,7 @@ nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IdListInit, Proc, Res
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
-    NOT, GT, GE, NE, LT, LE, EQ, UMINUS;
+    NOT, GT, GE, NE, LT, LE, EQ, UMINUS, RETURN;
 
 terminal String ID, STRING_CONST;
 terminal int INT_CONST;
@@ -47,9 +47,13 @@ IdListInit ::= ID {: RESULT = 0;  :}
 	| IdListInit COMMA ID ASSIGN Expr {: RESULT = 0;  :}
 ;
 Proc ::= PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
-		VarDeclList StatList ReturnExprs CORP SEMI {: RESULT = 0;  :}
+		VarDeclList StatList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
 	| PROC ID LPAR RPAR ResultTypeList COLON
-		VarDeclList StatList ReturnExprs CORP SEMI {: RESULT = 0;  :}
+		VarDeclList StatList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
+    | PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
+            VarDeclList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
+    | PROC ID LPAR RPAR ResultTypeList COLON
+        VarDeclList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
 ;
 ResultTypeList ::= ResultType {: RESULT = 0;  :}
 	| ResultType COMMA ResultTypeList {: RESULT = 0;  :}
@@ -80,7 +84,6 @@ Stat ::= IfStat SEMI {: RESULT = 0;  :}
 	| WriteStat SEMI {: RESULT = 0;  :}
 	| AssignStat SEMI {: RESULT = 0;  :}
 	| CallProc SEMI {: RESULT = 0;  :}
-	| /* empty */ {: RESULT = 0;  :}
 ;
 IfStat ::= IF Expr THEN StatList ElifList Else FI {: RESULT = 0;  :}
 ;
@@ -92,7 +95,7 @@ Elif ::= ELIF Expr THEN StatList {: RESULT = 0;  :}
 Else ::= /* empty */ {: RESULT = 0;  :}
     | ELSE StatList {: RESULT = 0;  :}
 ;
-WhileStat ::= WHILE StatList Expr DO StatList OD {: RESULT = 0;  :}
+WhileStat ::= WHILE StatList RETURN Expr DO StatList OD {: RESULT = 0;  :}
 	| WHILE Expr DO StatList OD {: RESULT = 0;  :}
 ;
 ReadlnStat ::= READ LPAR IdList RPAR {: RESULT = 0;  :}
