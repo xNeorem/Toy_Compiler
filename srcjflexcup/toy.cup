@@ -71,17 +71,16 @@ IdList ::= ID {: RESULT = 0;  :}
 ResultType ::= Type {: RESULT = 0;  :}
     | VOID {: RESULT = 0;  :}
 ;
-StatList ::= Stat SEMI {: RESULT = 0;  :}
-    | Stat SEMI StatList {: RESULT = 0;  :}
-    | /* empty NUOVA*/ {: RESULT = 0;  :}
+StatList ::= Stat  {: RESULT = 0;  :}
+    | Stat StatList {: RESULT = 0;  :}
 ;
-Stat ::= IfStat {: RESULT = 0;  :}
-	| WhileStat  {: RESULT = 0;  :}
-	| ReadlnStat {: RESULT = 0;  :}
-	| WriteStat  {: RESULT = 0;  :}
-	| AssignStat  {: RESULT = 0;  :}
-	| CallProc  {: RESULT = 0;  :}
-    /*| /* empty  {: RESULT = 0;  :}*/
+Stat ::= IfStat SEMI {: RESULT = 0;  :}
+	| WhileStat SEMI {: RESULT = 0;  :}
+	| ReadlnStat SEMI {: RESULT = 0;  :}
+	| WriteStat SEMI {: RESULT = 0;  :}
+	| AssignStat SEMI {: RESULT = 0;  :}
+	| CallProc SEMI {: RESULT = 0;  :}
+	| /* empty */ {: RESULT = 0;  :}
 ;
 IfStat ::= IF Expr THEN StatList ElifList Else FI {: RESULT = 0;  :}
 ;
@@ -94,7 +93,7 @@ Else ::= /* empty */ {: RESULT = 0;  :}
     | ELSE StatList {: RESULT = 0;  :}
 ;
 WhileStat ::= WHILE StatList Expr DO StatList OD {: RESULT = 0;  :}
-/*|  WHILE Expr DO StatList OD {: RESULT = 0;  :}*/
+	| WHILE Expr DO StatList OD {: RESULT = 0;  :}
 ;
 ReadlnStat ::= READ LPAR IdList RPAR {: RESULT = 0;  :}
 ;

@@ -12,16 +12,6 @@ public class Node<T>{
         this.data = data;
     }
 
-    public Node(T data, Node child) {
-        this.data = data;
-        this.addChild(child);
-    }
-
-    public Node(T data, List<Node> children) {
-        this.data = data;
-        this.addChildren(children);
-    }
-
     public void addChild(Node child) {
         child.setParent(this);
         this.children.add(child);

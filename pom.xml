@@ -48,9 +48,9 @@
                     <cupDefinition>srcjflexcup/toy.cup</cupDefinition>
                     <outputDirectory>src/main/java</outputDirectory>
                     <packageName>it.esercitazione4</packageName>
-                    <dumpGrammar>false</dumpGrammar>
-                    <dumpStates>true</dumpStates>
-                    <dumpTables>false</dumpTables>
+                    <dumpGrammar>${isFinal}</dumpGrammar>
+                    <dumpStates>${isFinal}</dumpStates>
+                    <dumpTables>${isFinal}</dumpTables>
                 </configuration>
             </plugin>
             <plugin>
