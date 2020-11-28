@@ -28,10 +28,7 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node{" +
-                "name='" + name + '\'' +
-                ", value=" + value +
-                '}';
+        return name;
     }
 
 

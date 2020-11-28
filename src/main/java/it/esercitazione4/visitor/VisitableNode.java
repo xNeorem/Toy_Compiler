@@ -54,15 +54,18 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             RESULT_TYPE = "ResultType",
 
             ID = "identifier",
-
-            IF_STAT_OP = "IfStatOp",
+            STAT_LIST_OP = "StatListOp",
+            IF_OP = "IfOp",
+            ELSE_OP = "ElseOp",
             ELIF_OP = "ElifOp",
+            ELIF_LIST_OP = "ElifListOp",
             WHILE_OP = "WhileOp",
             CALL_PROC_OP = "CallProcOp",
             VAR_DECL_OP = "VarDeclOp",
-            BODY_OP = "BodyOp",
+            VAR_DECL_LIST_OP = "VarDeclListOp",
             PAR_DECL_OP = "ParDeclOp",
-            PROC_BODY_OP = "ProcBodyOp",
+            PARAM_DECL_LIST_OP = "ParDeclOp",
+            PROC_LIST_OP = "ProcListOp",
             PROC_OP = "ProcOp",
             PROGRAM_OP = "ProgramOp",
 
@@ -72,27 +75,9 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
 
             EXPR_LIST_OP = "ExprListOp",
             RESULT_TYPE_LIST_OP = "ResultTypeListOp",
-            ID_LIST_OP = "IdListOp";
+            ID_LIST_OP = "IdListOp",
+            ID_LIST_INIT_OP = "IdListInitOp",
+
+            RETURN_EXPRS_OP = "ReturnExprsOp";
 
 }
-
-/*          EXPR_NODE = "ExprOp",
-            CONSTANT_NODE = "constant",
-            CONST_NODE = "ConstOp",
-            VAR_NODE = "VarOp",
-            MUL_NODE = "multiplying_operator",
-            BLOCK_OP = "BlockOp",
-            ADD_NODE = "adding_operator",
-            REL_NODE = "relational_operator",
-            REL_OP = "RelationalOp",
-            SIMPLE_NODE = "SimpleExprOp",
-            IF_THEN_ELSE_NODE = "IfThenElseOp",
-            IF_THEN_NODE = "IfThenOp",
-            CALL_OP_NODE = "CallOp",
-            COMP_NODE = "CompStatOp",
-            SIMPLE_BLOCK_NODE = "SimpleBlockOp",
-            PROC_NODE = "ProcDeclOp",
-            PROC_DECL_PART = "ProcDeclPartOp",
-            PROGRAM_NODE = "ProgramOp",
-            VAR_DECL_PART_NODE = "VarDeclPartOp";
-* */

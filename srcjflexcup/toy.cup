@@ -26,10 +26,9 @@ parser code {:
             }
  :}
 
-nonterminal Program, ProcList, Proc, StatList, Stat;
-
 nonterminal VisitableNode<Node> Expr, ExprList, IdList, CallProc, WriteStat, AssignStat, ReadlnStat, Type,
-            ResultType,ResultTypeList, ParDecl, IdListInit, ReturnExprs, VarDecl, ParamDeclList, VarDeclList, IfStat, ElifList, Elif, Else, WhileStat;
+            ResultType,ResultTypeList, ParDecl, IdListInit, ReturnExprs, VarDecl, ParamDeclList, VarDeclList, IfStat,
+            ElifList, Elif, Else, WhileStat, StatList, Stat, Proc, Program, ProcList;
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
@@ -46,7 +45,12 @@ precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
 
-Program ::= VarDeclList ProcList {: RESULT = 0;  :};
+Program ::= VarDeclList:vdl ProcList:pl {:RESULT = makeNode(VisitableNode.PROGRAM_OP,vdl,pl);
+                                          SyntaxVisitor visitor = new SyntaxVisitor();
+                                          visitor.visit(RESULT);
+                                          visitor.saveFileXML("file.xml");
+                                          System.out.println("DONE");
+                                          :};
 
 VarDeclList ::=
 /* empty */ {: :}
@@ -61,8 +65,13 @@ VarDeclList ::=
                                 :}
 ;
 
-ProcList ::= Proc {: RESULT = 0;  :}
-	| Proc ProcList {: RESULT = 0;  :}
+ProcList ::= Proc:p {: RESULT = makeNode(VisitableNode.PROC_LIST_OP);
+                     ArrayList<VisitableNode<Node>> ps = new ArrayList<VisitableNode<Node>>();
+                     ps.add(p);
+                     RESULT.data().setValue(ps); :}
+	| Proc:p ProcList:ps {: ((ArrayList<VisitableNode<Node>>) ps.data().getValue()).add(0, p);
+                        RESULT = ps;
+                      :}
 ;
 
 VarDecl ::= Type:t IdListInit:i SEMI {: RESULT = makeNode(VisitableNode.VAR_DECL_OP, t, i);  :}
@@ -89,7 +98,7 @@ IdListInit ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_INIT_OP);
                         RESULT.data().setValue(ids); :}
     | IdListInit:i COMMA ID:id {:   VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
                                     idNode.data().setValue(id);
-                                    ((ArrayList<VisitableNode<Node>>) i.data()).add(idNode);
+                                    ((ArrayList<VisitableNode<Node>>) i.data().getValue()).add(idNode);
                                     RESULT = i; :}
     /*int a=5, b, c, d*/
 	| ID:id ASSIGN Expr:e {: RESULT = makeNode(VisitableNode.ID_LIST_INIT_OP);
@@ -103,17 +112,33 @@ IdListInit ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_INIT_OP);
 	| IdListInit:i COMMA ID:id ASSIGN Expr:e {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
                                                 idNode.data().setValue(id);
                                                 VisitableNode<Node> assignNode = makeNode(VisitableNode.ASSIGN_OP, idNode, e);
-                                                ((ArrayList<VisitableNode<Node>>) i.data()).getValue().add(assignNode);
+                                                ((ArrayList<VisitableNode<Node>>) i.data().getValue()).add(assignNode);
                                                 RESULT = i; :}
 ;
-Proc ::= PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
-		VarDeclList StatList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
-	| PROC ID LPAR RPAR ResultTypeList COLON
-		VarDeclList StatList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
-    | PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
-            VarDeclList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
-    | PROC ID LPAR RPAR ResultTypeList COLON
-        VarDeclList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
+Proc ::= PROC ID:id LPAR ParamDeclList:pdl RPAR ResultTypeList:rtl COLON
+		VarDeclList:vdl StatList:st RETURN ReturnExprs:re CORP SEMI {:
+		VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                            idNode.data().setValue(id);
+		RESULT = makeNode(VisitableNode.PROC_OP, idNode, pdl, rtl, vdl, st, re);
+		:}
+	| PROC ID:id LPAR RPAR ResultTypeList:rtl COLON
+		VarDeclList:vdl StatList:st RETURN ReturnExprs:re CORP SEMI {:
+        VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                              idNode.data().setValue(id);
+        RESULT = makeNode(VisitableNode.PROC_OP, idNode, rtl, vdl, st, re);
+        :}
+    | PROC ID:id LPAR ParamDeclList:pdl RPAR ResultTypeList:rtl COLON
+            VarDeclList:vdl RETURN ReturnExprs:re CORP SEMI {:
+             VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                                 idNode.data().setValue(id);
+             RESULT = makeNode(VisitableNode.PROC_OP, idNode, pdl, rtl, vdl, re);
+             :}
+    | PROC ID:id LPAR RPAR ResultTypeList:rtl COLON
+        VarDeclList:vdl RETURN ReturnExprs:re CORP SEMI {:
+            VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                                  idNode.data().setValue(id);
+            RESULT = makeNode(VisitableNode.PROC_OP, idNode, rtl, vdl, re);
+            :}
 ;
 ResultTypeList ::= ResultType:rt {: RESULT = makeNode(VisitableNode.RESULT_TYPE_LIST_OP);
                                             ArrayList<VisitableNode<Node>> rts = new ArrayList<VisitableNode<Node>>();
@@ -129,14 +154,18 @@ ExprList ::= Expr:e {: RESULT = makeNode(VisitableNode.EXPR_LIST_OP);
                        ArrayList<VisitableNode<Node>> expressions = new ArrayList<VisitableNode<Node>>();
                        expressions.add(e);
                        RESULT.data().setValue(expressions); :}
-	| Expr:e COMMA ExprList:exprs {: ((ArrayList<VisitableNode<Node>>) exprs.data().getValue()).add(0, e); :}
+	| Expr:e COMMA ExprList:exprs {: ((ArrayList<VisitableNode<Node>>) exprs.data().getValue()).add(0, e);
+	                                RESULT = exprs;
+	                              :}
 ;
 
 ParamDeclList ::= ParDecl:pd {: RESULT = makeNode(VisitableNode.PARAM_DECL_LIST_OP);
                                 ArrayList<VisitableNode<Node>> pds = new ArrayList<VisitableNode<Node>>();
                                 pds.add(pd);
                                 RESULT.data().setValue(pds); :}
-    | ParamDeclList:pds SEMI ParDecl:pd {: ((ArrayList<VisitableNode<Node>>) pds.data().getValue()).add(pd);   :}
+    | ParamDeclList:pds SEMI ParDecl:pd {: ((ArrayList<VisitableNode<Node>>) pds.data().getValue()).add(pd);
+                                           RESULT = pds;
+                                         :}
 ;
 
 ParDecl ::= Type:t IdList:ids {: RESULT = makeNode(VisitableNode.PAR_DECL_OP, t, ids); :}
@@ -159,16 +188,21 @@ ResultType ::= Type:e {: RESULT = makeNode(VisitableNode.RESULT_TYPE,e);  :}
                                          RESULT = makeNode(VisitableNode.RESULT_TYPE,node);   :}
 ;
 
-StatList ::= Stat SEMI  {: RESULT = 0;  :}
-    | Stat SEMI StatList {: RESULT = 0;  :}
+StatList ::= Stat:e SEMI  {: RESULT = makeNode(VisitableNode.STAT_LIST_OP);
+                                     ArrayList<VisitableNode<Node>> stms = new ArrayList<VisitableNode<Node>>();
+                                     stms.add(e);
+                                     RESULT.data().setValue(stms); :}
+
+    | Stat:st SEMI StatList:stms {: ((ArrayList<VisitableNode<Node>>) stms.data().getValue()).add(0, st);
+                               RESULT = stms; :}
 ;
 
-Stat ::= IfStat {: RESULT = 0;  :}
-	| WhileStat {: RESULT = 0;  :}
-	| ReadlnStat {: RESULT = 0;  :}
-	| WriteStat {: RESULT = 0;  :}
-	| AssignStat {: RESULT = 0;  :}
-	| CallProc {: RESULT = 0;  :}
+Stat ::= IfStat:e {: RESULT = e;  :}
+	| WhileStat:e {: RESULT = e;  :}
+	| ReadlnStat:e {: RESULT = e;  :}
+	| WriteStat:e {: RESULT = e;  :}
+	| AssignStat:e {: RESULT = e;  :}
+	| CallProc:e {: RESULT = e;  :}
 ;
 
 IfStat ::= IF Expr:e THEN StatList:stms ElifList:els Else:el FI {: RESULT = makeNode(VisitableNode.IF_OP, e, stms, els, el); :}
