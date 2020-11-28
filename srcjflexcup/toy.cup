@@ -5,26 +5,6 @@ import it.esercitazione4.visitor.*;
 import java_cup.runtime.*;
 
 parser code {:
-
-       public VisitableNode<Node> makeNode(String name,Object value, VisitableNode<Node> ... childrens){
-                Node node = new Node(name,value);
-                VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
-               for(int i = 0; i < childrens.length; i ++){
-                   toReturn.add(childrens[i]);
-               }
-               return toReturn;
-           }
-
-         public VisitableNode<Node> makeNode(String name,Object value, ArrayList<VisitableNode<Node>> childrens){
-
-                    Node node = new Node(name,value);
-                    VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
-
-                    for (VisitableNode<Node> nodeChild : childrens)
-                       toReturn.add(nodeChild);
-
-                   return toReturn;
-            }
        public VisitableNode<Node> makeNode(String name, VisitableNode<Node> ... childrens){
                 Node node = new Node(name);
                 VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
@@ -48,11 +28,13 @@ parser code {:
 
 nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IdListInit, Proc, ResultTypeList, ReturnExprs, ExprList,
     ParamDeclList, ParDecl, IdList, ResultType, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat, ReadlnStat,
-    WriteStat, AssignStat, CallProc, Expr;
+    WriteStat, AssignStat, CallProc ;
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
     NOT, GT, GE, NE, LT, LE, EQ, UMINUS, RETURN;
+
+nonterminal VisitableNode<Node> Expr;
 
 terminal String ID, STRING_CONST;
 terminal int INT_CONST;
@@ -128,46 +110,67 @@ Stat ::= IfStat SEMI {: RESULT = 0;  :}
 ;
 IfStat ::= IF Expr THEN StatList ElifList Else FI {: RESULT = 0;  :}
 ;
+
 ElifList ::= /* empty */ {: RESULT = 0;  :}
 	| Elif ElifList {: RESULT = 0;  :}
 ;
+
 Elif ::= ELIF Expr THEN StatList {: RESULT = 0;  :}
 ;
+
 Else ::= /* empty */ {: RESULT = 0;  :}
     | ELSE StatList {: RESULT = 0;  :}
 ;
+
 WhileStat ::= WHILE StatList RETURN Expr DO StatList OD {: RESULT = 0;  :}
 	| WHILE Expr DO StatList OD {: RESULT = 0;  :}
 ;
+
 ReadlnStat ::= READ LPAR IdList RPAR {: RESULT = 0;  :}
 ;
+
 WriteStat ::=  WRITE LPAR ExprList RPAR {: RESULT = 0;  :}
 ;
+
 AssignStat ::= IdList ASSIGN  ExprList {: RESULT = 0;  :}
 ;
-CallProc ::= ID LPAR ExprList RPAR {: RESULT = 0;  :}
-	| ID LPAR RPAR {: RESULT = 0;  :}
+
+CallProc ::= ID:id LPAR ExprList:exprs RPAR {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                                      node.setValue(id);
+                                      RESULT = makeNode(VisitableNode.CALL_PROC_OP, idNode, exprs); :}
+	| ID:id LPAR RPAR {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                         node.setValue(id);
+                         RESULT = makeNode(VisitableNode.CALL_PROC_OP, idNode); :}
 ;
+
 Expr ::= NULL {: RESULT = makeNode(VisitableNode.NULL_CONST,"null"); :}
 	| TRUE {: RESULT = makeNode(VisitableNode.TRUE_CONST,"true");  :}
 	| FALSE {: RESULT = makeNode(VisitableNode.FALSE_CONST, "false");  :}
-	| INT_CONST:e {: RESULT = makeNode(VisitableNode.INT_CONST, e);  :}
-	| FLOAT_CONST:e {: RESULT = makeNode(VisitableNode.FLOAT_CONST, e);  :}
-	| STRING_CONST:e {: RESULT = makeNode(VisitableNode.STRING_CONST, e);  :}
-	| ID:e {: RESULT = makeNode(VisitableNode.ID, e);  :}
-    | CallProc {: RESULT = 0;  :}
-	| Expr  PLUS Expr {: RESULT = 0;  :}
-	| Expr  MINUS Expr {: RESULT = 0;  :}
-	| Expr  TIMES Expr {: RESULT = 0;  :}
-	| Expr  DIV Expr {: RESULT = 0;  :}
-	| Expr  AND Expr {: RESULT = 0;  :}
-	| Expr  OR Expr {: RESULT = 0;  :}
-	| Expr  GT Expr {: RESULT = 0;  :}
-	| Expr  GE Expr {: RESULT = 0;  :}
-	| Expr  LT Expr {: RESULT = 0;  :}
-	| Expr:e  LE Expr:e1 {: RESULT = makeNode(VisitableNode.LE_OP,e,e1); :}
-	| Expr:e  EQ Expr:e1 {: RESULT = makeNode(VisitableNode.EQ_OP,e,e1); :}
-	| Expr:e  NE Expr:e1 {: RESULT = makeNode(VisitableNode.NE_OP,e,e1);  :}
-	| MINUS Expr {: RESULT = 0;  :} %prec UMINUS
+	| INT_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.INT_CONST);
+	                 node.setValue(e);
+	                 RESULT = node; :}
+	| FLOAT_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.FLOAT_CONST);
+                    	                 node.setValue(e);
+                    	                 RESULT = node; :}
+	| STRING_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.STRING_CONST);
+                     	                 node.setValue(e);
+                     	                 RESULT = node; :}
+	| ID:e {: VisitableNode<Node> node = makeNode(VisitableNode.ID);
+           	                 node.setValue(e);
+           	                 RESULT = node; :}
+    | CallProc:e {: RESULT = e;  :}
+	| Expr:e1 PLUS Expr:e2 {: RESULT = makeNode(VisitableNode.ADD_OP,e1,e2); :}
+	| Expr:e1 MINUS Expr:e2 {: RESULT = makeNode(VisitableNode.DIFF_OP,e1,e2); :}
+	| Expr:e1 TIMES Expr:e2 {: RESULT = makeNode(VisitableNode.MUL_OP,e1,e2); :}
+	| Expr:e1 DIV Expr:e2 {: RESULT = makeNode(VisitableNode.DIV_OP,e1,e2); :}
+	| Expr:e1 AND Expr:e2 {: RESULT = makeNode(VisitableNode.AND_OP,e1,e2); :}
+	| Expr:e1 OR Expr:e2 {: RESULT = makeNode(VisitableNode.OR_OP,e1,e2); :}
+	| Expr:e1 GT Expr:e2 {: RESULT = makeNode(VisitableNode.GT_OP,e1,e2); :}
+	| Expr:e1 GE Expr:e2 {: RESULT = makeNode(VisitableNode.GE_OP,e1,e2); :}
+	| Expr:e1 LT Expr:e2 {: RESULT = makeNode(VisitableNode.LT_OP,e1,e2); :}
+	| Expr:e1 LE Expr:e2 {: RESULT = makeNode(VisitableNode.LE_OP,e1,e2); :}
+	| Expr:e1 EQ Expr:e2 {: RESULT = makeNode(VisitableNode.EQ_OP,e1,e2); :}
+	| Expr:e1 NE Expr:e2 {: RESULT = makeNode(VisitableNode.NE_OP,e1,e2);  :}
+	| MINUS Expr:e {: RESULT = makeNode(VisitableNode.UMINUS_OP,e);  :} %prec UMINUS
 	| NOT Expr:e {: RESULT = makeNode(VisitableNode.NOT_OP,e);  :}
 ;
