@@ -13,6 +13,10 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
         return visitor.visit(this);
     }
 
+    public T getData(){
+        return this.data;
+    }
+
     /*
     public VisitableNode<T> firstChild(){
         return (VisitableNode<T>) this.subtrees[0];
