@@ -5,6 +5,26 @@ import it.esercitazione4.visitor.*;
 import java_cup.runtime.*;
 
 parser code {:
+
+       public VisitableNode<Node> makeNode(String name,Object value, VisitableNode<Node> ... childrens){
+                Node node = new Node(name,value);
+                VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
+               for(int i = 0; i < childrens.length; i ++){
+                   toReturn.add(childrens[i]);
+               }
+               return toReturn;
+           }
+
+         public VisitableNode<Node> makeNode(String name,Object value, ArrayList<VisitableNode<Node>> childrens){
+
+                    Node node = new Node(name,value);
+                    VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
+
+                    for (VisitableNode<Node> nodeChild : childrens)
+                       toReturn.add(nodeChild);
+
+                   return toReturn;
+            }
        public VisitableNode<Node> makeNode(String name, VisitableNode<Node> ... childrens){
                 Node node = new Node(name);
                 VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
@@ -128,8 +148,8 @@ AssignStat ::= IdList ASSIGN  ExprList {: RESULT = 0;  :}
 CallProc ::= ID LPAR ExprList RPAR {: RESULT = 0;  :}
 	| ID LPAR RPAR {: RESULT = 0;  :}
 ;
-Expr ::= NULL {: RESULT = 0;  :}
-	| TRUE {: RESULT = 0;  :}
+Expr ::= NULL {: RESULT = makeNode(VisitableNode.NULL_CONST,"null"); :}
+	| TRUE {: RESULT = makeNode(VisitableNode.TRUE_CONST,"true")  :}
 	| FALSE {: RESULT = 0;  :}
 	| INT_CONST {: RESULT = 0;  :}
 	| FLOAT_CONST {: RESULT = 0;  :}
@@ -149,5 +169,5 @@ Expr ::= NULL {: RESULT = 0;  :}
 	| Expr  EQ Expr {: RESULT = 0;  :}
 	| Expr  NE Expr {: RESULT = 0;  :}
 	| MINUS Expr {: RESULT = 0;  :} %prec UMINUS
-	| NOT Expr {: RESULT = 0;  :}
+	| NOT Expr:e {: RESULT = makeNode(VisitableNode.NOT_OP,e);  :}
 ;

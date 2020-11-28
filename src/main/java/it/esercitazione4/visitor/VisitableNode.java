@@ -1,11 +1,6 @@
 package it.esercitazione4.visitor;
 
-import com.scalified.tree.TreeNode;
 import com.scalified.tree.multinode.ArrayMultiTreeNode;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable {
 
@@ -46,12 +41,14 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             LT_OP = "LTOp",
             LE_OP = "LEOp",
             EQ_OP = "EQOp",
+
             INT_CONST = "int_const",
             FLOAT_CONST = "float_const",
             STRING_CONST = "string_const",
             NULL_CONST = "null",
             TRUE_CONST = "true",
             FALSE_CONST = "false",
+
             ID = "identifier",
 
             IF_STAT_OP = "IfStatOp",
