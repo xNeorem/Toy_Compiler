@@ -26,10 +26,11 @@ parser code {:
             }
  :}
 
-nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IdListInit, Proc, ResultTypeList, ReturnExprs,
-    ParamDeclList, ParDecl, ResultType, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat, ReadlnStat;
+nonterminal Program, VarDeclList, ProcList, VarDecl, IdListInit, Proc, ReturnExprs,
+    ParamDeclList, ParDecl, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat;
 
-nonterminal VisitableNode<Node> Expr, ExprList, IdList, CallProc, WriteStat, AssignStat;
+nonterminal VisitableNode<Node> Expr, ExprList, IdList, CallProc, WriteStat, AssignStat, ReadlnStat, Type,
+            ResultType,ResultTypeList;
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
@@ -58,10 +59,18 @@ ProcList ::= Proc {: RESULT = 0;  :}
 ;
 VarDecl ::= Type IdListInit SEMI {: RESULT = 0;  :}
 ;
-Type ::= INT {: RESULT = 0;  :}
-    | BOOL {: RESULT = 0;  :}
-    | FLOAT {: RESULT = 0;  :}
-    | STRING {: RESULT = 0;  :}
+Type ::= INT {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
+                                             node.data().setValue("int");
+                                             RESULT = node;  :}
+    | BOOL {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
+                                             node.data().setValue("bool");
+                                             RESULT = node;   :}
+    | FLOAT {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
+                                             node.data().setValue("float");
+                                             RESULT = node;  :}
+    | STRING {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
+                                             node.data().setValue("string");
+                                             RESULT = node;  :}
 ;
 IdListInit ::= ID {: RESULT = 0;  :}
 	| IdListInit COMMA ID {: RESULT = 0;  :}
@@ -77,10 +86,13 @@ Proc ::= PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
     | PROC ID LPAR RPAR ResultTypeList COLON
         VarDeclList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
 ;
-ResultTypeList ::= ResultType {: RESULT = 0;  :}
-	| ResultType COMMA ResultTypeList {: RESULT = 0;  :}
+ResultTypeList ::= ResultType:rt {: RESULT = makeNode(VisitableNode.RESULT_TYPE_LIST_OP);
+                                            ArrayList<VisitableNode<Node>> rts = new ArrayList<VisitableNode<Node>>();
+                                            rts.add(rt);
+                                            RESULT.data().setValue(rts); :}
+	| ResultType:rt COMMA ResultTypeList:rts {: ((ArrayList<VisitableNode<Node>>) rts.data().getValue()).add(0, rt);  :}
 ;
-ReturnExprs::=  ExprList {: RESULT = 0;  :}
+ReturnExprs::=  ExprList:e {: RESULT = ;  :}
 	| /* empty */ {: RESULT = 0;  :}
 ;
 
@@ -109,20 +121,22 @@ IdList ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_OP);
                                 ((ArrayList<VisitableNode<Node>>) ids.data().getValue()).add(0, idNode); :}
 ;
 
-ResultType ::= Type {: RESULT = 0;  :}
-    | VOID {: RESULT = 0;  :}
+ResultType ::= Type:e {: RESULT = makeNode(VisitableNode.RESULT_TYPE,e);  :}
+    | VOID {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
+                                         node.data().setValue("void");
+                                         RESULT = makeNode(VisitableNode.RESULT_TYPE,node);   :}
 ;
 
-StatList ::= Stat  {: RESULT = 0;  :}
-    | Stat StatList {: RESULT = 0;  :}
+StatList ::= Stat SEMI  {: RESULT = 0;  :}
+    | Stat SEMI StatList {: RESULT = 0;  :}
 ;
 
-Stat ::= IfStat SEMI {: RESULT = 0;  :}
-	| WhileStat SEMI {: RESULT = 0;  :}
-	| ReadlnStat SEMI {: RESULT = 0;  :}
-	| WriteStat SEMI {: RESULT = 0;  :}
-	| AssignStat SEMI {: RESULT = 0;  :}
-	| CallProc SEMI {: RESULT = 0;  :}
+Stat ::= IfStat {: RESULT = 0;  :}
+	| WhileStat {: RESULT = 0;  :}
+	| ReadlnStat {: RESULT = 0;  :}
+	| WriteStat {: RESULT = 0;  :}
+	| AssignStat {: RESULT = 0;  :}
+	| CallProc {: RESULT = 0;  :}
 ;
 
 IfStat ::= IF Expr THEN StatList ElifList Else FI {: RESULT = 0;  :}
@@ -143,7 +157,7 @@ WhileStat ::= WHILE StatList RETURN Expr DO StatList OD {: RESULT = 0;  :}
 	| WHILE Expr DO StatList OD {: RESULT = 0;  :}
 ;
 
-ReadlnStat ::= READ LPAR IdList RPAR {: RESULT = 0;  :}
+ReadlnStat ::= READ LPAR IdList:ids RPAR {: RESULT = makeNode(VisitableNode.READ_OP,ids);  :}
 ;
 
 WriteStat ::=  WRITE LPAR ExprList:exprs RPAR {: RESULT = makeNode(VisitableNode.WRITE_OP,exprs); :}

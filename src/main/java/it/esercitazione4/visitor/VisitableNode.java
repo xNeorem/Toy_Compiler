@@ -50,6 +50,9 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             TRUE_CONST = "true",
             FALSE_CONST = "false",
 
+            TYPE_DECL = "TypeDecl",
+            RESULT_TYPE = "ResultType",
+
             ID = "identifier",
 
             IF_STAT_OP = "IfStatOp",
@@ -68,6 +71,7 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             READ_OP = "ReadOp",
 
             EXPR_LIST_OP = "ExprListOp",
+            RESULT_TYPE_LIST_OP = "ResultTypeListOp",
             ID_LIST_OP = "IdListOp";
 
 }
