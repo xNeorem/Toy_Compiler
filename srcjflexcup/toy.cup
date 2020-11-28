@@ -165,9 +165,9 @@ Expr ::= NULL {: RESULT = makeNode(VisitableNode.NULL_CONST,"null"); :}
 	| Expr  GT Expr {: RESULT = 0;  :}
 	| Expr  GE Expr {: RESULT = 0;  :}
 	| Expr  LT Expr {: RESULT = 0;  :}
-	| Expr  LE Expr {: RESULT = 0;  :}
-	| Expr  EQ Expr {: RESULT = 0;  :}
-	| Expr  NE Expr {: RESULT = 0;  :}
+	| Expr:e  LE Expr:e1 {: RESULT = makeNode(VisitableNode.LE_OP,e,e1); :}
+	| Expr:e  EQ Expr:e1 {: RESULT = makeNode(VisitableNode.EQ_OP,e,e1); :}
+	| Expr:e  NE Expr:e1 {: RESULT = makeNode(VisitableNode.NE_OP,e,e1);  :}
 	| MINUS Expr {: RESULT = 0;  :} %prec UMINUS
 	| NOT Expr:e {: RESULT = makeNode(VisitableNode.NOT_OP,e);  :}
 ;
