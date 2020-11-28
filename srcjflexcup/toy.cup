@@ -149,12 +149,12 @@ CallProc ::= ID LPAR ExprList RPAR {: RESULT = 0;  :}
 	| ID LPAR RPAR {: RESULT = 0;  :}
 ;
 Expr ::= NULL {: RESULT = makeNode(VisitableNode.NULL_CONST,"null"); :}
-	| TRUE {: RESULT = makeNode(VisitableNode.TRUE_CONST,"true")  :}
-	| FALSE {: RESULT = 0;  :}
-	| INT_CONST {: RESULT = 0;  :}
-	| FLOAT_CONST {: RESULT = 0;  :}
-	| STRING_CONST {: RESULT = 0;  :}
-	| ID {: RESULT = 0;  :}
+	| TRUE {: RESULT = makeNode(VisitableNode.TRUE_CONST,"true");  :}
+	| FALSE {: RESULT = makeNode(VisitableNode.FALSE_CONST, "false");  :}
+	| INT_CONST:e {: RESULT = makeNode(VisitableNode.INT_CONST, e);  :}
+	| FLOAT_CONST:e {: RESULT = makeNode(VisitableNode.FLOAT_CONST, e);  :}
+	| STRING_CONST:e {: RESULT = makeNode(VisitableNode.STRING_CONST, e);  :}
+	| ID:e {: RESULT = makeNode(VisitableNode.ID, e);  :}
     | CallProc {: RESULT = 0;  :}
 	| Expr  PLUS Expr {: RESULT = 0;  :}
 	| Expr  MINUS Expr {: RESULT = 0;  :}

@@ -15,7 +15,7 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
 
     /*
     public VisitableNode<T> firstChild(){
-        return (VisitableNode<T>) this.subtrees()[0];
+        return (VisitableNode<T>) this.subtrees[0];
     }
 
     public int numChild(){
@@ -23,7 +23,7 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
     }
 
     public VisitableNode<T> getChild(int i ){
-        return (VisitableNode<T>) this.subtrees()[i];
+        return (VisitableNode<T>) this.subtrees[i];
     }
     */
 
