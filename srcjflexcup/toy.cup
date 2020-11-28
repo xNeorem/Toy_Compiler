@@ -27,11 +27,9 @@ parser code {:
  :}
 
 nonterminal Program, VarDeclList, ProcList, VarDecl, Type, IdListInit, Proc, ResultTypeList, ReturnExprs,
-    ParamDeclList, ParDecl, ResultType, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat, ReadlnStat,
-    WriteStat, AssignStat, CallProc;
+    ParamDeclList, ParDecl, ResultType, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat, ReadlnStat;
 
-nonterminal VisitableNode<Node> Expr;
-nonterminal ArrayList<VisitableNode<Node>> ExprList, IdList;
+nonterminal VisitableNode<Node> Expr, ExprList, IdList, CallProc, WriteStat, AssignStat;
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
@@ -102,12 +100,12 @@ ParDecl ::= Type IdList {: RESULT = 0;  :}
 
 IdList ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_OP);
                     VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                    idNode.setValue(id);
+                    idNode.data().setValue(id);
                     ArrayList<VisitableNode<Node>> ids = new ArrayList<VisitableNode<Node>>();
                     ids.add(idNode);
                     RESULT.data().setValue(ids); :}
     | IdList:ids COMMA ID:id {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                                idNode.setValue(id);
+                                idNode.data().setValue(id);
                                 ((ArrayList<VisitableNode<Node>>) ids.data().getValue()).add(0, idNode); :}
 ;
 
@@ -148,7 +146,7 @@ WhileStat ::= WHILE StatList RETURN Expr DO StatList OD {: RESULT = 0;  :}
 ReadlnStat ::= READ LPAR IdList RPAR {: RESULT = 0;  :}
 ;
 
-WriteStat ::=  WRITE LPAR ExprList RPAR {: RESULT = 0;  :}
+WriteStat ::=  WRITE LPAR ExprList:exprs RPAR {: RESULT = makeNode(VisitableNode.WRITE_OP,exprs); :}
 ;
 
 AssignStat ::= IdList:ids ASSIGN  ExprList:exprs {: RESULT = makeNode(VisitableNode.ASSIGN_OP, ids, exprs); :}
@@ -162,20 +160,26 @@ CallProc ::= ID:id LPAR ExprList:exprs RPAR {: VisitableNode<Node> idNode = make
                          RESULT = makeNode(VisitableNode.CALL_PROC_OP, idNode); :}
 ;
 
-Expr ::= NULL {: RESULT = makeNode(VisitableNode.NULL_CONST,"null"); :}
-	| TRUE {: RESULT = makeNode(VisitableNode.TRUE_CONST,"true");  :}
-	| FALSE {: RESULT = makeNode(VisitableNode.FALSE_CONST, "false");  :}
+Expr ::= NULL {: VisitableNode<Node> node = makeNode(VisitableNode.NULL_CONST);
+                          	                 node.data().setValue("null");
+                          	                 RESULT = node; :}
+	| TRUE {: VisitableNode<Node> node = makeNode(VisitableNode.TRUE_CONST);
+                                        	                 node.data().setValue("true");
+                                        	                 RESULT = node;  :}
+	| FALSE {: VisitableNode<Node> node = makeNode(VisitableNode.FALSE_CONST);
+                                         	                 node.data().setValue("false");
+                                         	                 RESULT = node;  :}
 	| INT_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.INT_CONST);
 	                 node.data().setValue(e);
 	                 RESULT = node; :}
 	| FLOAT_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.FLOAT_CONST);
-                    	                 node().setValue(e);
+                    	                 node.data().setValue(e);
                     	                 RESULT = node; :}
 	| STRING_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.STRING_CONST);
                      	                 node.data().setValue(e);
                      	                 RESULT = node; :}
 	| ID:e {: VisitableNode<Node> node = makeNode(VisitableNode.ID);
-           	                 node.setValue(e);
+           	                 node.data().setValue(e);
            	                 RESULT = node; :}
     | CallProc:e {: RESULT = e;  :}
 	| Expr:e1 PLUS Expr:e2 {: RESULT = makeNode(VisitableNode.ADD_OP,e1,e2); :}
