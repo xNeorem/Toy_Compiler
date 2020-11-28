@@ -13,10 +13,6 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
         return visitor.visit(this);
     }
 
-    public T getData(){
-        return this.data;
-    }
-
     /*
     public VisitableNode<T> firstChild(){
         return (VisitableNode<T>) this.subtrees[0];
@@ -44,6 +40,7 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             GE_OP = "GEOp",
             LT_OP = "LTOp",
             LE_OP = "LEOp",
+            NE_OP = "LEOp",
             EQ_OP = "EQOp",
 
             INT_CONST = "int_const",
@@ -68,7 +65,11 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
 
             ASSIGN_OP = "AssignOp",
             WRITE_OP = "WriteOp",
-            READ_OP = "ReadOp";
+            READ_OP = "ReadOp",
+
+            EXPR_LIST_OP = "ExprListOp",
+            ID_LIST_OP = "IdListOp";
+
 }
 
 /*          EXPR_NODE = "ExprOp",
