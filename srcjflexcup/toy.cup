@@ -27,10 +27,10 @@ parser code {:
  :}
 
 nonterminal Program, VarDeclList, ProcList, VarDecl, IdListInit, Proc, ReturnExprs,
-    ParamDeclList, ParDecl, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat;
+    ParamDeclList, StatList, Stat, IfStat, ElifList, Elif, Else, WhileStat;
 
 nonterminal VisitableNode<Node> Expr, ExprList, IdList, CallProc, WriteStat, AssignStat, ReadlnStat, Type,
-            ResultType,ResultTypeList;
+            ResultType,ResultTypeList, ParDecl;
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
@@ -57,7 +57,7 @@ VarDeclList ::=
 ProcList ::= Proc {: RESULT = 0;  :}
 	| Proc ProcList {: RESULT = 0;  :}
 ;
-VarDecl ::= Type IdListInit SEMI {: RESULT = 0;  :}
+VarDecl ::= Type:t IdListInit:i SEMI {: RESULT = makeNode(VisitableNode.VAR_DECL_OP, t, i);  :}
 ;
 Type ::= INT {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
                                              node.data().setValue("int");
@@ -72,10 +72,22 @@ Type ::= INT {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
                                              node.data().setValue("string");
                                              RESULT = node;  :}
 ;
-IdListInit ::= ID {: RESULT = 0;  :}
-	| IdListInit COMMA ID {: RESULT = 0;  :}
-	| ID ASSIGN Expr {: RESULT = 0;  :}
-	| IdListInit COMMA ID ASSIGN Expr {: RESULT = 0;  :}
+IdListInit ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_INIT_OP);
+                        VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                        idNode.data().setValue(id);
+                        ArrayList<VisitableNode<Node>> ids = new ArrayList<VisitableNode<Node>>();
+                        ids.add(idNode);
+                        RESULT.data().setValue(ids); :}
+    | IdListInit:i COMMA ID:id {:   VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                                    idNode.data().setValue(id);
+                                    ((ArrayList<VisitableNode<Node>>) i.data()).add(idNode);
+                                    RESULT = i; :}
+	| ID:id ASSIGN Expr:e {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                             idNode.data().setValue(id);
+                             RESULT = makeNode(VisitableNode.ASSIGN_OP, idNode, e);  :}
+	| IdListInit:i COMMA ID:id ASSIGN Expr:e {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
+                                                idNode.data().setValue(id);
+                                                RESULT = makeNode(VisitableNode.ASSIGN_OP, i, idNode, e);  :}
 ;
 Proc ::= PROC ID LPAR ParamDeclList RPAR ResultTypeList COLON
 		VarDeclList StatList RETURN ReturnExprs CORP SEMI {: RESULT = 0;  :}
@@ -92,8 +104,8 @@ ResultTypeList ::= ResultType:rt {: RESULT = makeNode(VisitableNode.RESULT_TYPE_
                                             RESULT.data().setValue(rts); :}
 	| ResultType:rt COMMA ResultTypeList:rts {: ((ArrayList<VisitableNode<Node>>) rts.data().getValue()).add(0, rt);  :}
 ;
-ReturnExprs::=  ExprList:e {: RESULT = ;  :}
-	| /* empty */ {: RESULT = 0;  :}
+ReturnExprs::=  ExprList:e {: RESULT = makeNode(VisitableNode.RETURN_EXPRS_OP, e);  :}
+	| /* empty */ {: :}
 ;
 
 ExprList ::= Expr:e {: RESULT = makeNode(VisitableNode.EXPR_LIST_OP);
@@ -103,11 +115,14 @@ ExprList ::= Expr:e {: RESULT = makeNode(VisitableNode.EXPR_LIST_OP);
 	| Expr:e COMMA ExprList:exprs {: ((ArrayList<VisitableNode<Node>>) exprs.data().getValue()).add(0, e); :}
 ;
 
-ParamDeclList ::= ParDecl {: RESULT = 0;  :}
-    | ParamDeclList SEMI ParDecl {: RESULT = 0;  :}
+ParamDeclList ::= ParDecl:pd {: RESULT = makeNode(VisitableNode.PARAM_DECL_LIST_OP);
+                                ArrayList<VisitableNode<Node>> pds = new ArrayList<VisitableNode<Node>>();
+                                pds.add(pd);
+                                RESULT.data().setValue(pds); :}
+    | ParamDeclList:pds SEMI ParDecl:pd {: ((ArrayList<VisitableNode<Node>>) pds.data().getValue()).add(pd);   :}
 ;
 
-ParDecl ::= Type IdList {: RESULT = 0;  :}
+ParDecl ::= Type:t IdList:ids {: RESULT = makeNode(VisitableNode.PAR_DECL_OP, t, ids); :}
 ;
 
 IdList ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_OP);
