@@ -75,7 +75,7 @@ id = [{letter}][{letter}|{digit}]*
     <<EOF>> { return new Symbol(sym.EOF); }
 }
 <STRING> {
-    <<EOF>>                         { throw new Error("Fine file raggiunto"); }
+    <<EOF>>                         { error("Fine file in string const"); }
     \"                              { yybegin(YYINITIAL); return new Symbol( sym.STRING_CONST,"\""+ string.toString() + "\""); }
     [^\n\r\"\\]+                    { string.append( yytext() ); }
     \\t                             { string.append('\t'); }
@@ -86,8 +86,8 @@ id = [{letter}][{letter}|{digit}]*
 }
 <COMMENT> {
     "*/"            { yybegin(YYINITIAL); }
-    [^"*/"]*        { /* ignore */}
-    <<EOF>>         { throw new Error("Fine file raggiunto"); }
+    ( [^*] | \*+ [^/*] )*      { /* ignore */}
+    <<EOF>>         { error("Fine file in commento"); }
 }
 [^] { error("Illegal character <"+ yytext()+">");}
 

@@ -140,11 +140,15 @@ Proc ::= PROC ID:id LPAR ParamDeclList:pdl RPAR ResultTypeList:rtl COLON
             RESULT = makeNode(VisitableNode.PROC_OP, idNode, rtl, vdl, re);
             :}
 ;
-ResultTypeList ::= ResultType:rt {: RESULT = makeNode(VisitableNode.RESULT_TYPE_LIST_OP);
+ResultTypeList ::= ResultType:rt {: VisitableNode<Node> rts_node = makeNode(VisitableNode.RESULT_TYPE_LIST_OP);
                                             ArrayList<VisitableNode<Node>> rts = new ArrayList<VisitableNode<Node>>();
                                             rts.add(rt);
-                                            RESULT.data().setValue(rts); :}
-	| ResultType:rt COMMA ResultTypeList:rts {: ((ArrayList<VisitableNode<Node>>) rts.data().getValue()).add(0, rt);  :}
+                                            rts_node.data().setValue(rts);
+                                            RESULT = rts_node;
+                                            :}
+	| ResultType:rt COMMA ResultTypeList:rts {: ((ArrayList<VisitableNode<Node>>) rts.data().getValue()).add(0, rt);
+	                                            RESULT = rts;
+	                                         :}
 ;
 ReturnExprs::=  ExprList:e {: RESULT = makeNode(VisitableNode.RETURN_EXPRS_OP, e);  :}
 	| /* empty */ {: :}
@@ -171,15 +175,19 @@ ParamDeclList ::= ParDecl:pd {: RESULT = makeNode(VisitableNode.PARAM_DECL_LIST_
 ParDecl ::= Type:t IdList:ids {: RESULT = makeNode(VisitableNode.PAR_DECL_OP, t, ids); :}
 ;
 
-IdList ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_OP);
+IdList ::= ID:id {: VisitableNode<Node> ids_node = makeNode(VisitableNode.ID_LIST_OP);
                     VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
                     idNode.data().setValue(id);
                     ArrayList<VisitableNode<Node>> ids = new ArrayList<VisitableNode<Node>>();
                     ids.add(idNode);
-                    RESULT.data().setValue(ids); :}
+                    ids_node.data().setValue(ids);
+                    RESULT = ids_node;
+                    :}
     | IdList:ids COMMA ID:id {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
                                 idNode.data().setValue(id);
-                                ((ArrayList<VisitableNode<Node>>) ids.data().getValue()).add(0, idNode); :}
+                                ((ArrayList<VisitableNode<Node>>) ids.data().getValue()).add(0, idNode);
+                                RESULT = ids;
+                                :}
 ;
 
 ResultType ::= Type:e {: RESULT = makeNode(VisitableNode.RESULT_TYPE,e);  :}
@@ -188,10 +196,12 @@ ResultType ::= Type:e {: RESULT = makeNode(VisitableNode.RESULT_TYPE,e);  :}
                                          RESULT = makeNode(VisitableNode.RESULT_TYPE,node);   :}
 ;
 
-StatList ::= Stat:e SEMI  {: RESULT = makeNode(VisitableNode.STAT_LIST_OP);
+StatList ::= Stat:e SEMI  {: VisitableNode<Node> stms_node = makeNode(VisitableNode.STAT_LIST_OP);
                                      ArrayList<VisitableNode<Node>> stms = new ArrayList<VisitableNode<Node>>();
                                      stms.add(e);
-                                     RESULT.data().setValue(stms); :}
+                                     stms_node.data().setValue(stms);
+                                     RESULT = stms_node;
+                                     :}
 
     | Stat:st SEMI StatList:stms {: ((ArrayList<VisitableNode<Node>>) stms.data().getValue()).add(0, st);
                                RESULT = stms; :}

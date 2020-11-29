@@ -1,0 +1,50 @@
+proc calc(int scelta; float a,b)float:
+    float result := 0.0;
+
+    if scelta = 1 then result := a + b;
+    elif scelta = 2 then result := a - b;
+    elif scelta = 3 then result := a * b;
+    elif scelta = 4 then
+        if b <> 0 then
+            result := a / b;
+        else
+            write("Impossibile\n");
+            result := 0;
+        fi;
+    fi;
+
+	-> result
+corp;
+
+proc main()void :
+	float a := 0.0, b := 0.0;
+
+	int scelta := 1;
+
+	while scelta = 1 do
+
+        write("MENU\nSeleziona un'operazione:\n");
+        write("1) Somma\n");
+        write("2) Sottrazione\n");
+        write("3) Motiplicazione\n");
+        write("4) Divisione\n");
+        write("\n Scelta:");
+        readln(scelta);
+
+
+        write("Inserire il primo argomento:\n");
+        readln(a);
+        write("Inserire il secondo argomento:\n");
+        readln(b);
+
+        write("Risultato: ",calc(scelta,a,b),"\n");
+
+        write("Digita 1 per continuare\n Scelta: ");
+        readln(scelta);
+
+    od;
+
+	->
+corp;
+
+

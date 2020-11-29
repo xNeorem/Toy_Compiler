@@ -1,4 +1,4 @@
-proc main()int:
+proc main()int,void,void:
     int a;
     a := 5;
     ->
