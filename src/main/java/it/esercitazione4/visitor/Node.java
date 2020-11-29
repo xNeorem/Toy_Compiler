@@ -28,9 +28,11 @@ public class Node {
 
     @Override
     public String toString() {
-        return name;
+        return "Node{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
+                '}';
     }
-
 
     private String name;
     private Object value;
