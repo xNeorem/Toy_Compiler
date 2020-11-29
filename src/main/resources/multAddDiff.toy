@@ -1,6 +1,6 @@
 /*
- * Calcolo di moltiplicazione, somma e differenza
-*/ 
+ Calcolo di moltiplicazione, somma e differenza
+*/
 
 string nome := "Michele";
 
@@ -12,7 +12,7 @@ proc multAddDiff ()int, int, int :
 	write("Inserire il secondo argomento:\n");
 	readln(secondo);
 	mul, add, diff := primo*secondo, primo + secondo, primo - secondo;
-	mul, add, diff
+	-> mul, add, diff
 corp;
 
 
@@ -21,6 +21,7 @@ proc writeNewLines(int n)void :
 		write("\n");
 		n := n -1;
 	od;
+	->
 corp;
 
 
@@ -31,4 +32,5 @@ proc main()void :
 	writeNewLines(2);
 	write("I tuoi valori sono:\n", a, " per la moltiplicazione\n", b, 
 		" per la somma, e \n", c, " per la differenza");
+	->
 corp;

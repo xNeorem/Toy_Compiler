@@ -86,7 +86,7 @@ id = [{letter}][{letter}|{digit}]*
 }
 <COMMENT> {
     "*/"            { yybegin(YYINITIAL); }
-    [^"/*"]*        { /* ignore */}
+    [^"*/"]*        { /* ignore */}
     <<EOF>>         { throw new Error("Fine file raggiunto"); }
 }
 [^] { error("Illegal character <"+ yytext()+">");}

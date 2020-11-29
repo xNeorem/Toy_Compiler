@@ -9,7 +9,7 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
     }
 
     @Override
-    public String accept(Visitor visitor) {
+    public Object accept(Visitor visitor) {
         return visitor.visit(this);
     }
 
