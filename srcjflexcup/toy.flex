@@ -10,7 +10,7 @@ import java_cup.runtime.Symbol;
 %{
   StringBuffer string = new StringBuffer();
   private void error(String message) {
-    System.out.println("Error at line "+(yyline+1)+", column "+(yycolumn+1)+" : "+message);
+    throw new Error("Error at line "+(yyline+1)+", column "+(yycolumn+1)+" : "+message);
   }
 %}
 
