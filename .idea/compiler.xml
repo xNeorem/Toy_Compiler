@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Fasano-Gullo_es4_tlp" />
+        <module name="Fasano-Gullo_es5_scg" />
       </profile>
     </annotationProcessing>
   </component>
