@@ -1,6 +1,9 @@
 package it.esercitazione4.visitor;
 
 import com.scalified.tree.multinode.ArrayMultiTreeNode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable {
 
@@ -16,6 +19,11 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
 
     public VisitableNode<T> firstChild(){
         return (VisitableNode<T>) this.subtrees().toArray()[0];
+    }
+
+    public ArrayList<VisitableNode<Node>> getSubtree(){
+      List<VisitableNode<Node>> list = Arrays.asList((VisitableNode<Node>[])this.subtrees().toArray());
+      return new ArrayList<>(list);
     }
 
     public int numChild(){
@@ -80,6 +88,8 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             ID_LIST_OP = "IdListOp",
             ID_LIST_INIT_OP = "IdListInitOp",
 
-            RETURN_EXPRS_OP = "ReturnExprsOp";
+            RETURN_EXPRS_OP = "ReturnExprsOp",
+
+            ERROR = "Error";
 
 }

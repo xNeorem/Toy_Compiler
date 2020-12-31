@@ -232,7 +232,7 @@ Else ::= /* empty */ {: :}
     | ELSE StatList:stms {: RESULT = makeNode(VisitableNode.ELSE_OP, stms); :}
 ;
 
-WhileStat ::= WHILE StatList:stms1 RETURN Expr:e DO StatList:stms2 OD {: RESULT = makeNode(VisitableNode.WHILE_OP, stms1, e, stms2); :}
+WhileStat ::= WHILE StatList:stms1 RETURN Expr:e DO StatList:stms2 OD {: RESULT = makeNode(VisitableNode.WHILE_OP, e, stms1, stms2); :}
 	| WHILE Expr:e DO StatList:stms OD {: RESULT = makeNode(VisitableNode.WHILE_OP, e, stms); :}
 ;
 

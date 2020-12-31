@@ -1,5 +1,6 @@
 package it.esercitazione4;
 
+import it.esercitazione4.symboltable.TableStack;
 import it.esercitazione4.visitor.Node;
 import it.esercitazione4.visitor.SemanticVisitor;
 import it.esercitazione4.visitor.SyntaxVisitor;
@@ -22,6 +23,14 @@ public class Tester {
         semanticVisitor.visit(result);
         System.out.println("SemanticVisitor done");
 
+        while(TableStack.size() != 0){
+            System.out.println(TableStack.getHead());
+            TableStack.getHead().getSymbolTable().symbolTable.entrySet().forEach(entry->{
+                System.out.println(entry.getKey() + " -> " + entry.getValue());
+            });
 
+            TableStack.pop();
+            System.out.println("NEW NODE\n");
+        }
     }
 }

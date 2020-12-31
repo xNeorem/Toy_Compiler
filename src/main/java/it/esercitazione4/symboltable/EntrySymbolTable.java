@@ -1,5 +1,7 @@
 package it.esercitazione4.symboltable;
 
+import java.util.Arrays;
+
 public class EntrySymbolTable {
 
   public EntrySymbolTable(String symbol, String type) {
@@ -53,6 +55,17 @@ public class EntrySymbolTable {
 
   public void setKind(String kind) {
     this.kind = kind;
+  }
+
+  @Override
+  public String toString() {
+    return "EntrySymbolTable{" +
+        "symbol='" + symbol + '\'' +
+        ", type='" + type + '\'' +
+        ", typeInput=" + Arrays.toString(typeInput) +
+        ", typeOutput=" + Arrays.toString(typeOutput) +
+        ", kind='" + kind + '\'' +
+        '}';
   }
 
   private String symbol;

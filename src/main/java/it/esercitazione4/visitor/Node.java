@@ -12,13 +12,16 @@ public class Node {
         this.value = value;
 
     }
-    static public Boolean createTable(Node node){
+    static public boolean createTable(Node node){
 
         if (!(node.name.equals(VisitableNode.PROC_OP) || node.name.equals(VisitableNode.PROGRAM_OP)))
             return false;
-
         node.symbolTable = new SymbolTable();
         return true;
+    }
+
+    public boolean hasTable(){
+        return (this.symbolTable != null);
     }
 
     public String getName() {

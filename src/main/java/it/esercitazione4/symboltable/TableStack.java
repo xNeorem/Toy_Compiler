@@ -21,12 +21,20 @@ public  class TableStack{
     return null;
   }
 
+  public static Node getHead(){
+    return stack.peek();
+  }
+
   public static void add(Node node){
     stack.add(node);
   }
 
-  public static Node pop(Node node){
+  public static Node pop(){
     return stack.pop();
+  }
+
+  public static int size(){
+    return stack.size();
   }
 
   private static final Stack<Node> stack = new Stack<>();

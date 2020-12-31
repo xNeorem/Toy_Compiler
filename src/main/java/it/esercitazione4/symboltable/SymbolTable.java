@@ -25,5 +25,5 @@ public class SymbolTable {
     this.symbolTable.put(symbol,new EntrySymbolTable(symbol,typeInput,typeOutput));
     return true;
   }
-  private HashMap<String,EntrySymbolTable> symbolTable;
+  public HashMap<String,EntrySymbolTable> symbolTable;
 }
