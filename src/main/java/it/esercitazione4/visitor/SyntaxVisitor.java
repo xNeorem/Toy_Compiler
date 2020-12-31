@@ -18,7 +18,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class SyntaxVisitor implements Visitor{
+public class SyntaxVisitor implements Visitor {
 
     public SyntaxVisitor() {
         try {
@@ -31,7 +31,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(Visitable node) {
+    public Object visit(Visitable node) throws Exception {
         VisitableNode<Node> rootNode = (VisitableNode<Node>) node;
         Element rootElement = doc.createElement(rootNode.data().getName());
         if(rootNode.data().getValue() != null && !(rootNode.data().getValue() instanceof ArrayList))

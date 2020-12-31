@@ -45,12 +45,7 @@ precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
 
-Program ::= VarDeclList:vdl ProcList:pl {:RESULT = makeNode(VisitableNode.PROGRAM_OP,vdl,pl);
-                                          SyntaxVisitor visitor = new SyntaxVisitor();
-                                          visitor.visit(RESULT);
-                                          visitor.saveFileXML("file.xml");
-                                          System.out.println("DONE");
-                                          :};
+Program ::= VarDeclList:vdl ProcList:pl {:RESULT = makeNode(VisitableNode.PROGRAM_OP,vdl,pl);  :};
 
 VarDeclList ::=
 /* empty */ {: :}
