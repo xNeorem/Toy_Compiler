@@ -5,7 +5,7 @@
     <option name="PROGRAM_PARAMETERS" value="src/main/resources/Hanoi.toy" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="it.esercitazione4.*" />
+        <option name="PATTERN" value="it.esercitazione4.symboltable.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

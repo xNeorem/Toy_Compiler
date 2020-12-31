@@ -1,5 +1,7 @@
 package it.esercitazione4.visitor;
 
+import it.esercitazione4.symboltable.SymbolTable;
+
 public class Node {
     public Node(String name) {
         this.name = name;
@@ -8,6 +10,15 @@ public class Node {
     public Node(String name, Object value) {
         this.name = name;
         this.value = value;
+
+    }
+    static public Boolean createTable(Node node){
+
+        if (!(node.name.equals(VisitableNode.PROC_OP) || node.name.equals(VisitableNode.PROGRAM_OP)))
+            return false;
+
+        node.symbolTable = new SymbolTable();
+        return true;
     }
 
     public String getName() {
@@ -26,6 +37,10 @@ public class Node {
         this.value = value;
     }
 
+    public SymbolTable getSymbolTable() {
+        return symbolTable;
+    }
+
     @Override
     public String toString() {
         return "Node{" +
@@ -36,4 +51,5 @@ public class Node {
 
     private String name;
     private Object value;
+    private SymbolTable symbolTable;
 }

@@ -49,6 +49,8 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             NULL_CONST = "null",
             TRUE_CONST = "true",
             FALSE_CONST = "false",
+            BOOLEAN_CONST = "bool",
+            VOID_CONST = "void",
 
             TYPE_DECL = "TypeDecl",
             RESULT_TYPE = "ResultType",
