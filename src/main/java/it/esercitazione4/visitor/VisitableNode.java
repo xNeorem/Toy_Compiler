@@ -9,13 +9,13 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
     }
 
     @Override
-    public Object accept(Visitor visitor) {
+    public Object accept(Visitor visitor) throws Exception {
         return visitor.visit(this);
     }
 
-    /*
+
     public VisitableNode<T> firstChild(){
-        return (VisitableNode<T>) this.subtrees[0];
+        return (VisitableNode<T>) this.subtrees().toArray()[0];
     }
 
     public int numChild(){
@@ -23,9 +23,9 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
     }
 
     public VisitableNode<T> getChild(int i ){
-        return (VisitableNode<T>) this.subtrees[i];
+        return (VisitableNode<T>) this.subtrees().toArray()[i];
     }
-    */
+
 
     public static final String
             UMINUS_OP = "UminusOp",
@@ -66,7 +66,7 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             VAR_DECL_OP = "VarDeclOp",
             VAR_DECL_LIST_OP = "VarDeclListOp",
             PAR_DECL_OP = "ParDeclOp",
-            PARAM_DECL_LIST_OP = "ParDeclOp",
+            PARAM_DECL_LIST_OP = "ParDeclListOp",
             PROC_LIST_OP = "ProcListOp",
             PROC_OP = "ProcOp",
             PROGRAM_OP = "ProgramOp",

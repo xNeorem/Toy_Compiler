@@ -37,6 +37,14 @@ public class Node {
         this.value = value;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public SymbolTable getSymbolTable() {
         return symbolTable;
     }
@@ -46,10 +54,12 @@ public class Node {
         return "Node{" +
                 "name='" + name + '\'' +
                 ", value=" + value +
+                ", type='" + type + '\'' +
                 '}';
     }
 
     private String name;
     private Object value;
+    private String type;
     private SymbolTable symbolTable;
 }

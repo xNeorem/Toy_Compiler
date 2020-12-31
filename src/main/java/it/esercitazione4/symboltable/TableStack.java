@@ -10,13 +10,23 @@ public  class TableStack{
     int i = stack.size() - 1;
 
     while(i > 0){
-      EntrySymbolTable entrySymbolTable = stack.get(i).getSymbolTable().lookUp(symbol);
-      if(entrySymbolTable != null) return entrySymbolTable;
-
+      SymbolTable currentSymbolTable = stack.get(i).getSymbolTable();
+      if(currentSymbolTable != null) {
+        EntrySymbolTable entrySymbolTable = currentSymbolTable.lookUp(symbol);
+        if (entrySymbolTable != null) return entrySymbolTable;
+      }
       i--;
     }
 
     return null;
+  }
+
+  public static void add(Node node){
+    stack.add(node);
+  }
+
+  public static Node pop(Node node){
+    return stack.pop();
   }
 
   private static final Stack<Node> stack = new Stack<>();

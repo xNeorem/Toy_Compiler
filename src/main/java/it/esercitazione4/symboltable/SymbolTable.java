@@ -18,8 +18,8 @@ public class SymbolTable {
     this.symbolTable.put(symbol,new EntrySymbolTable(symbol,type));
     return true;
   }
-  public boolean addToTable(String symbol, String[] typeInput, String[] typeOutput){
 
+  public boolean addToTable(String symbol, String[] typeInput, String[] typeOutput){
     if(this.symbolTable.containsKey(symbol))
       return false;
     this.symbolTable.put(symbol,new EntrySymbolTable(symbol,typeInput,typeOutput));
