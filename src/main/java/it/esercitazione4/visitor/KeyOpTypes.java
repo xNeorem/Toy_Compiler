@@ -17,6 +17,7 @@ public class KeyOpTypes {
         '}';
   }
 
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -26,7 +27,7 @@ public class KeyOpTypes {
       return false;
     }
 
-    SemanticVisitor.KeyOpTypes that = (SemanticVisitor.KeyOpTypes) o;
+    KeyOpTypes that = (KeyOpTypes) o;
 
     if (first != null ? !first.equals(that.first) : that.first != null) {
       return false;
