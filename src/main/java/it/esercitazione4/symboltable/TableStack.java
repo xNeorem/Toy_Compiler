@@ -1,6 +1,5 @@
 package it.esercitazione4.symboltable;
 
-import it.esercitazione4.visitor.Node;
 import java.util.Stack;
 
 public  class TableStack{
@@ -10,7 +9,7 @@ public  class TableStack{
     int i = stack.size() - 1;
 
     while(i > 0){
-      SymbolTable currentSymbolTable = stack.get(i).getSymbolTable();
+      SymbolTable currentSymbolTable = stack.get(i);
       if(currentSymbolTable != null) {
         EntrySymbolTable entrySymbolTable = currentSymbolTable.lookUp(symbol);
         if (entrySymbolTable != null) return entrySymbolTable;
@@ -21,15 +20,15 @@ public  class TableStack{
     return null;
   }
 
-  public static Node getHead(){
+  public static SymbolTable getHead(){
     return stack.peek();
   }
 
-  public static void add(Node node){
+  public static void add(SymbolTable node){
     stack.add(node);
   }
 
-  public static Node pop(){
+  public static SymbolTable pop(){
     return stack.pop();
   }
 
@@ -37,5 +36,5 @@ public  class TableStack{
     return stack.size();
   }
 
-  private static final Stack<Node> stack = new Stack<>();
+  private static final Stack<SymbolTable> stack = new Stack<>();
 }

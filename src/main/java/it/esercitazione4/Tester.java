@@ -1,10 +1,5 @@
 package it.esercitazione4;
 
-import it.esercitazione4.symboltable.TableStack;
-import it.esercitazione4.visitor.Node;
-import it.esercitazione4.visitor.SemanticVisitor;
-import it.esercitazione4.visitor.SyntaxVisitor;
-import it.esercitazione4.visitor.VisitableNode;
 import java.io.FileReader;
 
 public class Tester {
@@ -17,7 +12,7 @@ public class Tester {
         visitor.visit(result);
         visitor.saveFileXML("file.xml");
         System.out.println("SyntaxVisitor done");
-
+/*
         System.out.println("SemanticVisitor starting...");
         SemanticVisitor semanticVisitor = new SemanticVisitor();
         semanticVisitor.visit(result);
@@ -32,5 +27,9 @@ public class Tester {
             TableStack.pop();
             System.out.println("NEW NODE\n");
         }
+        visitor = new SyntaxVisitor();
+        visitor.visit(result);
+        visitor.saveFileXML("file1.xml");
+        System.out.println("filexml done");*/
     }
 }

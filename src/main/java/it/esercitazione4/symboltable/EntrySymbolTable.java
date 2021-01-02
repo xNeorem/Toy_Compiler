@@ -1,5 +1,6 @@
 package it.esercitazione4.symboltable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class EntrySymbolTable {
@@ -10,7 +11,7 @@ public class EntrySymbolTable {
     this.kind = KIND_VAR;
   }
 
-  public EntrySymbolTable(String symbol, String[] typeInput, String[] typeOutput) {
+  public EntrySymbolTable(String symbol, ArrayList<String> typeInput, ArrayList<String> typeOutput) {
     this.symbol = symbol;
     this.typeInput = typeInput;
     this.typeOutput = typeOutput;
@@ -33,19 +34,19 @@ public class EntrySymbolTable {
     this.type = type;
   }
 
-  public String[] getTypeInput() {
+  public ArrayList<String> getTypeInput() {
     return typeInput;
   }
 
-  public void setTypeInput(String[] typeInput) {
+  public void setTypeInput(ArrayList<String> typeInput) {
     this.typeInput = typeInput;
   }
 
-  public String[] getTypeOutput() {
+  public ArrayList<String> getTypeOutput() {
     return typeOutput;
   }
 
-  public void setTypeOutput(String[] typeOutput) {
+  public void setTypeOutput(ArrayList<String> typeOutput) {
     this.typeOutput = typeOutput;
   }
 
@@ -62,16 +63,16 @@ public class EntrySymbolTable {
     return "EntrySymbolTable{" +
         "symbol='" + symbol + '\'' +
         ", type='" + type + '\'' +
-        ", typeInput=" + Arrays.toString(typeInput) +
-        ", typeOutput=" + Arrays.toString(typeOutput) +
+        ", typeInput=" + typeInput +
+        ", typeOutput=" + typeOutput +
         ", kind='" + kind + '\'' +
         '}';
   }
 
   private String symbol;
   private String type;
-  private String[] typeInput;
-  private String[] typeOutput;
+  private ArrayList<String> typeInput;
+  private ArrayList<String> typeOutput;
   private String kind;
 
   public final static String

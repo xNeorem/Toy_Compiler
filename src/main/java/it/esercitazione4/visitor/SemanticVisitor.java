@@ -16,23 +16,70 @@ public class SemanticVisitor implements Visitor {
     public Object visit(Visitable node) throws Exception {
         VisitableNode<Node> rootNode = (VisitableNode<Node>) node;
         Iterator<VisitableNode> childs = ((VisitableNode) rootNode).subtrees().iterator();
+        Node currNode = rootNode.data();
+        String rootName = currNode.getName();
 
+        //SCOPING
         //REGOLA A
-        if (Node.createTable(rootNode.data())) TableStack.add(rootNode.data());
+        if (Node.createTable(currNode)) TableStack.add(currNode);
 
         //REGOLA B
-        if (rootNode.data().getName().equals(VisitableNode.VAR_DECL_OP) || rootNode.data().getName().equals(VisitableNode.PAR_DECL_OP)) {
+        if (rootName.equals(VisitableNode.VAR_DECL_OP) || rootName.equals(VisitableNode.PAR_DECL_OP)) {
             String type = (String) rootNode.getChild(0).data().getValue();
             ArrayList<VisitableNode<Node>> idList = (ArrayList<VisitableNode<Node>>) rootNode.getChild(1).data().getValue();
             for (VisitableNode<Node> idNode : idList){
                 if(idNode.data().getName().equals(VisitableNode.ASSIGN_OP)){
+                    idNode.getChild(0).data().setType(type);
                     if (!TableStack.getHead().getSymbolTable().addToTable((String) idNode.getChild(0).data().getValue(), type))
-                        throw new AlreadyDeclaredException();
+                        throw new AlreadyDeclaredException((String) idNode.getChild(0).data().getValue());
                 }
-                else if (!TableStack.getHead().getSymbolTable().addToTable((String) idNode.data().getValue(), type))
-                    throw new AlreadyDeclaredException();
+                else{
+                    idNode.data().setType(type);
+                    if (!TableStack.getHead().getSymbolTable().addToTable((String) idNode.data().getValue(), type))
+                        throw new AlreadyDeclaredException((String) idNode.data().getValue());
+                }
+
             }
         }
+
+        if(rootName.equals(VisitableNode.PROC_OP)){
+            String id = (String) rootNode.getChild(0).data().getValue();
+            ArrayList<String> parameters = new ArrayList<>();
+            ArrayList<String> returnTypes = new ArrayList<>();
+
+            VisitableNode<Node> pardecllist = rootNode.getChild(1);
+            if(pardecllist != null){
+                for(VisitableNode<Node> pardecl : (ArrayList<VisitableNode<Node>>)pardecllist.data().getValue()){
+                    String type = (String) pardecl.getChild(0).data().getValue();
+                    int size = ((ArrayList<VisitableNode<Node>>) pardecl.getChild(1).data().getValue()).size();
+                    for(int i = 0; i < size; i++)
+                        parameters.add(type);
+                }
+            }
+
+            VisitableNode<Node> returnsList = rootNode.getChild(2);
+            ArrayList<VisitableNode<Node>> rtls = returnsList.getSubtree();
+            for(VisitableNode<Node> rtl : rtls){
+                String type = (String) rtl.getChild(0).data().getValue();
+                returnTypes.add(type);
+            }
+
+            TableStack.getHead().getSymbolTable().addToTable(id,parameters,returnTypes);
+
+        }
+
+        if(rootName.equals(VisitableNode.ID) && currNode.getType() == null){
+            EntrySymbolTable entry = TableStack.lookUp((String)currNode.getValue());
+            if(entry == null)
+                throw new UndeclaredException((String)currNode.getValue());
+
+            currNode.setType(entry.getType());
+        }
+
+        //TYPECHECKING
+        if(SemanticVisitor.isConstant(rootNode.data()))
+            this.typeCheckD(rootNode);
+
 
         if(rootNode.data().getValue() != null && rootNode.data().getValue() instanceof ArrayList){
             for (VisitableNode<Node> currentNode : (ArrayList<VisitableNode<Node>>)rootNode.data().getValue())
@@ -42,9 +89,15 @@ public class SemanticVisitor implements Visitor {
         VisitableNode currentNode;
         while(childs.hasNext()) {
             currentNode = childs.next();
-            this.typeSystem(currentNode);
-            currentNode.accept(this);
+            if(currentNode != null)
+                currentNode.accept(this);
         }
+        if(!SemanticVisitor.isConstant(rootNode.data()))
+            this.typeCheckE(rootNode);
+
+
+
+
 
         /*
 
@@ -69,10 +122,10 @@ public class SemanticVisitor implements Visitor {
     }
 
     //REGOLA D
-    private void typeCheckD(Node node) {
-        if(node.getName().equals(VisitableNode.TRUE_CONST) || node.getName().equals(VisitableNode.FALSE_CONST))
-            node.setType(VisitableNode.BOOLEAN_CONST);
-        else node.setType(node.getName());
+    private void typeCheckD(VisitableNode<Node> node) {
+        if(node.data().getName().equals(VisitableNode.TRUE_CONST) || node.data().getName().equals(VisitableNode.FALSE_CONST))
+            node.data().setType(VisitableNode.BOOLEAN_CONST);
+        else node.data().setType(node.data().getName());
     }
 
     //REGOLA E
@@ -82,7 +135,8 @@ public class SemanticVisitor implements Visitor {
 
         for (VisitableNode<Node> child : node.getSubtree()){
             this.typeSystem(child);
-            flag = child.data().getType().equals(VisitableNode.ERROR);
+            if(child.data().getType() != null)
+                flag = child.data().getType().equals(VisitableNode.ERROR);
             if(flag)
                 break;
         }
@@ -174,6 +228,16 @@ public class SemanticVisitor implements Visitor {
 
         }
 
+    }
+
+    private static boolean isConstant(Node node){
+        String name = node.getName();
+        if(name.equals(VisitableNode.TRUE_CONST) || name.equals(VisitableNode.FALSE_CONST)
+           || name.equals(VisitableNode.INT_CONST) || name.equals(VisitableNode.FLOAT_CONST)
+            || name.equals(VisitableNode.STRING_CONST))
+            return true;
+
+        return false;
     }
 
 
