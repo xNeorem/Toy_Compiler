@@ -1,9 +1,12 @@
 package it.esercitazione4.visitor;
 
+import it.esercitazione4.exceptions.TypeMismatchException;
 import it.esercitazione4.nodes.*;
+import it.esercitazione4.symboltable.TableStack;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClangVisitor implements Visitor{
@@ -18,33 +21,51 @@ public class ClangVisitor implements Visitor{
   public Object visit(AssignStatNode node) throws Exception {
     String code = "";
     code += (String) node.getIdListNode().accept(this);
+    code += ClangVisitor.operators.get(Node.ASSIGN_OP);
     code += (String) node.getExprListNode().accept(this);
     return code;
   }
 
   @Override
   public Object visit(BoolConstLeaf leaf) throws Exception {
-    return "int ";
+    return String.valueOf(leaf.isValue()) + " ";
   }
 
   @Override
   public Object visit(CallProcNode node) throws Exception {
-    return null;
+    String code = "";
+    code += (String) node.getIdLeaf().accept(this);
+    if(node.getExprListNode() != null)
+      code += String.format("(%s)", (String)node.getExprListNode().accept(this));
+    else
+      code += "()";
+    return code;
   }
 
   @Override
   public Object visit(ElifListNode node) throws Exception {
-    return null;
+    String code = "";
+    for(ElifNode elifNode : node.getElifListNode())
+      code += (String) elifNode.accept(this);
+    return code;
   }
 
   @Override
   public Object visit(ElifNode node) throws Exception {
-    return null;
+    String code = "else if(";
+    code += (String) node.getExprNode().accept(this);
+    code += "){\n";
+    code += (String) node.getStatiListNode().accept(this);
+    code += "}\n";
+    return code;
   }
 
   @Override
   public Object visit(ElseNode node) throws Exception {
-    return null;
+    String code = "else {\n";
+    code += (String) node.getStatListNode().accept(this);
+    code += "}\n";
+    return code;
   }
 
   @Override
@@ -52,7 +73,6 @@ public class ClangVisitor implements Visitor{
     String code = "";
     for (ExprNode exprNode : node.getExprListNode()) {
       code += (String) exprNode.accept(this);
-      code += ";";
     }
     return code;
   }
@@ -112,7 +132,7 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(FloatConstLeaf leaf) throws Exception {
-    return "float ";
+    return String.valueOf(leaf.getValue()) + " ";
   }
 
   @Override
@@ -146,12 +166,21 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(IfStatNode node) throws Exception {
-    return null;
+    String code = "if(";
+    code += (String) node.getExprNode().accept(this);
+    code += "){\n";
+    code += (String) node.getStatListNode().accept(this);
+    code += "}\n";
+    if(node.getElifListNode() != null)
+      code += (String) node.getElifListNode().accept(this);
+    if(node.getElseNode() != null)
+      code += (String) node.getElseNode().accept(this);
+    return code;
   }
 
   @Override
   public Object visit(IntConstLeaf leaf) throws Exception {
-    return "int ";
+    return String.valueOf(leaf.getValue()) + " ";
   }
 
   @Override
@@ -191,7 +220,12 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(ProcNode node) throws Exception {
-    String code = (String) node.getResultTypeListNode().accept(this);
+    String functionName = node.getName();
+    String code = "";
+
+    TableStack.add(node.getSymbolTable());
+
+    code += (String) node.getResultTypeListNode().accept(this);
 
     code += (String) node.getIdLeaf().accept(this);
 
@@ -213,11 +247,13 @@ public class ClangVisitor implements Visitor{
 
     code += "}\n";
 
+    TableStack.pop();
     return code;
   }
 
   @Override
   public Object visit(ProgramNode node) throws Exception {
+    TableStack.add(node.getSymbolTable());
     String code = "#include <stdio.h>\n";
     code += "#include <string.h>\n";
     code += "#define null ((char *)0)\n";
@@ -229,12 +265,23 @@ public class ClangVisitor implements Visitor{
 
     code += (String) node.getProcListNode().accept(this);
     clangCode = code;
+    TableStack.pop();
     return null;
   }
 
   @Override
   public Object visit(ReadlnStatNode node) throws Exception {
-    return null;
+    String code = "";
+    String types = "";
+    String params = "";
+    for(IdLeaf idLeaf : node.getIdListNode().getIdListNode()){
+      params += "&" + (String) idLeaf.accept(this) + ", ";
+      types += ClangVisitor.ioConst.get(idLeaf.getType()) + " ";
+    }
+    params = params.substring(0, params.length()-2);
+    types = types.substring(0, types.length()-1);
+    code += String.format("scanf(\"%s\", %s);", types, params);
+    return code;
   }
 
   @Override
@@ -257,17 +304,40 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(ReturnExprsNode node) throws Exception {
-    return null;
+    return "return " + (String) node.getExprListNode().accept(this);
   }
 
   @Override
   public Object visit(StatListNode node) throws Exception {
-    return null;
+    String code = "";
+    for (StatNode statNode : node.getStatListNode()){
+      if(statNode == null) continue;
+
+      if(statNode instanceof AssignStatNode){
+        code += (String) ((AssignStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof CallProcNode){
+        code += (String) ((CallProcNode) statNode).accept(this);
+      }
+      if(statNode instanceof IfStatNode){
+        code += (String) ((IfStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof WhileStatNode){
+        code += (String) ((WhileStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof WriteStatNode){
+        code += (String) ((WriteStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof ReadlnStatNode){
+        code += (String) ((ReadlnStatNode) statNode).accept(this);
+      }
+    }
+    return code;
   }
 
   @Override
   public Object visit(StringConstLeaf leaf) throws Exception {
-    return null;
+    return leaf.getValue() + " ";
   }
 
   @Override
@@ -287,18 +357,52 @@ public class ClangVisitor implements Visitor{
   public Object visit(VarDeclNode node) throws Exception {
     String code = "";
     code += (String) node.getTypeDeclNode().accept(this);
-    code += (String) node.getIdListInitNode().accept(this);
+    //code += (String) node.getIdListInitNode().accept(this);
+    for(Object obj : node.getIdListInitNode().getIdListInitNode()){
+
+      if(obj instanceof IdLeaf){
+        code += (String) ((IdLeaf)obj).accept(this);
+      }
+
+      else if(obj instanceof AssignStatNode){
+        ArrayList<IdLeaf> idLeaves = ((AssignStatNode) obj).getIdListNode().getIdListNode();
+        ArrayList<ExprNode> exprNodes = ((AssignStatNode) obj).getExprListNode().getExprListNode();
+        code += (String) idLeaves.get(0).accept(this);
+        code += ClangVisitor.operators.get(Node.ASSIGN_OP);
+        code += (String) exprNodes.get(0).accept(this);
+      }
+
+      code += ", ";
+    }
+    code = code.substring(0, code.length()-2);
+    code += ';';
     return code;
   }
 
   @Override
   public Object visit(WhileStatNode node) throws Exception {
-    return null;
+    String code = "";
+    if(node.getStatListNode1() != null)
+      code += (String) node.getStatListNode1().accept(this);
+    code += "while(" + (String) node.getExprNode().accept(this) + "){";
+    code += (String) node.getStatListNode2().accept(this);
+    code += "}\n";
+    return code;
   }
 
   @Override
   public Object visit(WriteStatNode node) throws Exception {
-    return null;
+    String code = "";
+    String types = "";
+    String params = "";
+    for(ExprNode exprNode : node.getExprListNode().getExprListNode()){
+      params += (String) exprNode.accept(this) + ", ";
+      types += ClangVisitor.ioConst.get(exprNode.getType());
+    }
+    params = params.substring(0, params.length()-2);
+
+    code = String.format("printf(\"%s\", %s);", types, params);
+    return code;
   }
 
   public void saveC(String fileName){
@@ -330,5 +434,12 @@ public class ClangVisitor implements Visitor{
     operators.put(Node.UMINUS_OP, "-");
     operators.put(Node.NOT_OP, "!");
     operators.put(Node.ASSIGN_OP, "=");
+  }
+  public static final HashMap<String, String> ioConst = new HashMap<>();
+  static {
+    ioConst.put(Node.INT_CONST, "%d");
+    ioConst.put(Node.FLOAT_CONST, "%f");
+    ioConst.put(Node.STRING_CONST, "%s");
+    ioConst.put(Node.BOOLEAN_CONST, "%d");
   }
 }
