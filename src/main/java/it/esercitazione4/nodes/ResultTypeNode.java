@@ -20,7 +20,7 @@ public class ResultTypeNode extends Node implements Visitable {
     this.isVoid = false;
   }
   @Override
-  public Object accept(Visitor visitor) {
+  public Object accept(Visitor visitor) throws Exception {
     return visitor.visit(this);
   }
 

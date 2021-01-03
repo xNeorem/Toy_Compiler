@@ -13,7 +13,7 @@ public class TypeDeclNode extends Node implements Visitable {
     this.name = Node.TYPE_DECL;
   }
   @Override
-  public Object accept(Visitor visitor) {
+  public Object accept(Visitor visitor) throws Exception {
     return visitor.visit(this);
   }
 

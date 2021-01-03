@@ -23,18 +23,9 @@ public class Tester {
         semanticVisitor.visit(result);
         System.out.println("SemanticVisitor done");
 
-        while(TableStack.size() != 0){
-            System.out.println(TableStack.getHead());
-            TableStack.getHead().symbolTable.entrySet().forEach(entry->{
-                System.out.println(entry.getKey() + " -> " + entry.getValue());
-            });
-
-            TableStack.pop();
-            System.out.println("NEW NODE\n");
-        }
         visitor = new SyntaxVisitor();
         visitor.visit(result);
-        visitor.saveXML("file1.xml");
+        visitor.saveXML(args[0]);
         System.out.println("filexml done");
     }
 }

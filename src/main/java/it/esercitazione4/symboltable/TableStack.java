@@ -8,7 +8,7 @@ public  class TableStack{
 
     int i = stack.size() - 1;
 
-    while(i > 0){
+    while(i >= 0){
       SymbolTable currentSymbolTable = stack.get(i);
       if(currentSymbolTable != null) {
         EntrySymbolTable entrySymbolTable = currentSymbolTable.lookUp(symbol);
@@ -35,6 +35,13 @@ public  class TableStack{
   public static int size(){
     return stack.size();
   }
+
+  public static void printTables(){
+    TableStack.getHead().symbolTable.entrySet().forEach(entry->{
+      System.out.println(entry.getKey() + " -> " + entry.getValue());
+    });
+  }
+
 
   private static final Stack<SymbolTable> stack = new Stack<>();
 }

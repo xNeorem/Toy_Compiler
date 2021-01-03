@@ -2,7 +2,7 @@
  * hanoi.t - standard "Towers of Hanoi" in toy.
  */
 
-proc printPeg(int peg)void:
+proc printPeg(int peg;float prova)void:
 
     if peg = 1 then
         write("left");

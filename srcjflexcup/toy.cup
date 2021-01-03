@@ -77,7 +77,7 @@ VarDecl ::= Type:t IdListInit:i SEMI {: RESULT = new VarDeclNode(t, i);  :}
 Type ::= INT {: RESULT = new TypeDeclNode("int");  :}
         | BOOL {: RESULT = new TypeDeclNode("bool");  :}
         | FLOAT {: RESULT = new TypeDeclNode("float");  :}
-        | STRING {: RESULT = new TypeDeclNode("String");  :}
+        | STRING {: RESULT = new TypeDeclNode("string");  :}
 ;
 IdListInit ::= ID:id {: ArrayList<Object> ids = new ArrayList<>();
                         ids.add(new IdLeaf(id));

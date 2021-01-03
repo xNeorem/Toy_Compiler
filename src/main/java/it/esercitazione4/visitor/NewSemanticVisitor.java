@@ -1,5 +1,9 @@
 package it.esercitazione4.visitor;
 
+import it.esercitazione4.exceptions.CallProcException;
+import it.esercitazione4.exceptions.ReturnParamsException;
+import it.esercitazione4.exceptions.TypeMismatchException;
+import it.esercitazione4.exceptions.UndeclaredException;
 import it.esercitazione4.nodes.AssignStatNode;
 import it.esercitazione4.nodes.BoolConstLeaf;
 import it.esercitazione4.nodes.CallProcNode;
@@ -26,30 +30,99 @@ import it.esercitazione4.nodes.ResultTypeListNode;
 import it.esercitazione4.nodes.ResultTypeNode;
 import it.esercitazione4.nodes.ReturnExprsNode;
 import it.esercitazione4.nodes.StatListNode;
+import it.esercitazione4.nodes.StatNode;
 import it.esercitazione4.nodes.StringConstLeaf;
 import it.esercitazione4.nodes.TypeDeclNode;
 import it.esercitazione4.nodes.VarDeclListNode;
 import it.esercitazione4.nodes.VarDeclNode;
 import it.esercitazione4.nodes.WhileStatNode;
 import it.esercitazione4.nodes.WriteStatNode;
+import it.esercitazione4.symboltable.EntrySymbolTable;
 import it.esercitazione4.symboltable.TableStack;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class NewSemanticVisitor implements Visitor{
 
   @Override
-  public Object visit(AssignStatNode node) {
+  public Object visit(AssignStatNode node) throws Exception {
+
+    node.getIdListNode().accept(this);
+    node.getExprListNode().accept(this);
+    ArrayList<IdLeaf> idLeaves = node.getIdListNode().getIdListNode();
+    ArrayList<ExprNode> exprNodes = node.getExprListNode().getExprListNode();
+
+
+    int size = exprNodes.size();
+    int j = 0;
+
+    for (int i = 0; i < size; i++){
+
+      if (exprNodes.get(i).getName().equals(Node.CALL_PROC_OP)) {
+
+        CallProcNode callProcNode = (CallProcNode) exprNodes.get(i).getValue1();
+        ArrayList<String> returnsCall = new ArrayList<String>(
+            Arrays.asList(callProcNode.getType().split(", ")));
+
+        for(String returns : returnsCall){
+          if(idLeaves.get(j).getType().equals(returns))
+            j++;
+          else
+            throw new TypeMismatchException();
+        }
+
+
+      } else if (!exprNodes.get(i).getType().contains(idLeaves.get(j).getType())) {
+        throw new TypeMismatchException();
+      }
+    }
+
+
     return null;
   }
 
   @Override
   public Object visit(BoolConstLeaf leaf) {
+    TableStack.getHead().addToTable(String.valueOf(leaf.isValue()),Node.BOOLEAN_CONST);
+    leaf.setType(Node.BOOLEAN_CONST);
     return null;
   }
 
   @Override
-  public Object visit(CallProcNode node) {
+  public Object visit(CallProcNode node) throws Exception {
+    String functionName = node.getIdLeaf().getValue();
+    EntrySymbolTable function = TableStack.lookUp(functionName);
+
+    if(function == null)
+      throw new UndeclaredException(functionName);
+
+    node.setType(function.getTypeOutput()
+        .toString()
+        .replace("[","")
+        .replace("]","")
+    );
+
+    if(node.getExprListNode() != null){
+
+      node.getExprListNode().accept(this);
+
+      ArrayList<String> inputTypes = function.getTypeInput();
+      ArrayList<ExprNode> nodeTypes = node.getExprListNode().getExprListNode();
+
+      if(inputTypes.size() != nodeTypes.size())
+        throw new CallProcException(functionName);
+
+      int size = inputTypes.size();
+
+      for(int i = 0; i < size; i++){
+        if(!nodeTypes.get(i).getType().contains(inputTypes.get(i)))
+          throw new CallProcException(functionName);
+      }
+
+    }
+
+
     return null;
   }
 
@@ -69,22 +142,101 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(ExprListNode node) {
+  public Object visit(ExprListNode node) throws Exception {
+
+    for(ExprNode exprNode : node.getExprListNode())
+      exprNode.accept(this);
     return null;
   }
 
   @Override
-  public Object visit(ExprNode node) {
+  public Object visit(ExprNode node) throws Exception {
+
+    String nodeName = node.getName();
+    switch (nodeName){
+      case Node.NULL_CONST:
+        ((NullConstLeaf)node.getValue1()).accept(this);
+        node.setType(((NullConstLeaf)node.getValue1()).getType());
+        break;
+      case Node.TRUE_CONST:
+      case Node.FALSE_CONST:
+        ((BoolConstLeaf)node.getValue1()).accept(this);
+        node.setType(((BoolConstLeaf)node.getValue1()).getType());
+        break;
+      case Node.INT_CONST:
+        ((IntConstLeaf)node.getValue1()).accept(this);
+        node.setType(((IntConstLeaf)node.getValue1()).getType());
+        break;
+      case Node.FLOAT_CONST:
+        ((FloatConstLeaf)node.getValue1()).accept(this);
+        node.setType(((FloatConstLeaf)node.getValue1()).getType());
+        break;
+      case Node.STRING_CONST:
+        ((StringConstLeaf)node.getValue1()).accept(this);
+        node.setType(((StringConstLeaf)node.getValue1()).getType());
+        break;
+      case Node.ID:
+        ((IdLeaf)node.getValue1()).accept(this);
+        node.setType(((IdLeaf)node.getValue1()).getType());
+        break;
+      case Node.CALL_PROC_OP:
+        ((CallProcNode)node.getValue1()).accept(this);
+        node.setType(((CallProcNode)node.getValue1()).getType());
+        break;
+      case Node.ADD_OP:
+      case Node.DIFF_OP:
+      case Node.MUL_OP:
+      case Node.DIV_OP:
+      case Node.AND_OP:
+      case Node.OR_OP:
+      case Node.GT_OP:
+      case Node.GE_OP:
+      case Node.LT_OP:
+      case Node.LE_OP:
+      case Node.EQ_OP:
+      case Node.NE_OP:
+        ((ExprNode)node.getValue1()).accept(this);
+        ((ExprNode)node.getValue2()).accept(this);
+
+        String type1 = ((ExprNode)node.getValue1()).getType();
+        String type2 = ((ExprNode)node.getValue2()).getType();
+
+        String result1 = NewSemanticVisitor.opTypes2.get(new KeyOpTypes(type1,type2,nodeName));
+        String result2 = NewSemanticVisitor.opTypes2.get(new KeyOpTypes(type2,type1,nodeName));
+
+        if(result1 != null)
+          node.setType(result1);
+        else if(result2 != null)
+          node.setType(result2);
+        else
+          throw new TypeMismatchException();
+
+        break;
+      case Node.UMINUS_OP:
+      case Node.NOT_OP:
+      case Node.ASSIGN_OP:
+        ((ExprNode)node.getValue1()).accept(this);
+        node.setType(((ExprNode)node.getValue1()).getType());
+        break;
+
+    }
+
     return null;
   }
 
   @Override
   public Object visit(FloatConstLeaf leaf) {
+    TableStack.getHead().addToTable(String.valueOf(leaf.getValue()),Node.FLOAT_CONST);
+    leaf.setType(Node.FLOAT_CONST);
     return null;
   }
 
   @Override
-  public Object visit(IdLeaf leaf) {
+  public Object visit(IdLeaf leaf) throws Exception {
+    if(TableStack.lookUp(leaf.getValue()) == null)
+      throw new UndeclaredException(leaf.getValue());
+
+    leaf.setType(TableStack.lookUp(leaf.getValue()).getType());
     return null;
   }
 
@@ -94,7 +246,9 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(IdListNode node) {
+  public Object visit(IdListNode node) throws Exception {
+    for(IdLeaf idLeaf: node.getIdListNode())
+      idLeaf.accept(this);
     return null;
   }
 
@@ -105,43 +259,98 @@ public class NewSemanticVisitor implements Visitor{
 
   @Override
   public Object visit(IntConstLeaf leaf) {
+    TableStack.getHead().addToTable(String.valueOf(leaf.getValue()),Node.INT_CONST);
+    leaf.setType(Node.INT_CONST);
     return null;
   }
 
   @Override
   public Object visit(NullConstLeaf leaf) {
+    TableStack.getHead().addToTable("null",Node.NULL_CONST);
+    leaf.setType(Node.NULL_CONST);
     return null;
   }
 
   @Override
-  public Object visit(ParamDeclListNode node) {
+  public Object visit(ParamDeclListNode node) throws Exception {
+
+    for(ParDeclNode parDeclNode : node.getParamDeclListNode())
+      parDeclNode.accept(this);
     return null;
   }
 
   @Override
-  public Object visit(ParDeclNode node) {
+  public Object visit(ParDeclNode node) throws Exception {
+    String type = node.getTypeDeclNode().getValue();
+
+    for(IdLeaf idLeaf : node.getIdListNode().getIdListNode()){
+      TableStack.getHead().addToTable(idLeaf.getValue(),type);
+      idLeaf.accept(this);
+    }
+
     return null;
   }
 
   @Override
-  public Object visit(ProcListNode node) {
+  public Object visit(ProcListNode node) throws Exception {
+
+    for(ProcNode procNode : node.getProcListNode())
+      procNode.accept(this);
+
     return null;
   }
 
   @Override
-  public Object visit(ProcNode node) {
+  public Object visit(ProcNode node) throws Exception {
     ArrayList<String> params = new ArrayList<>();
     ArrayList<String> returns = new ArrayList<>();
 
     if(node.getParamDeclListNode() != null)
-      for(ParDeclNode parDeclNode : node.getParamDeclListNode().getParamDeclListNode())
-        params.add(parDeclNode.getTypeDeclNode().getValue());
+      for(ParDeclNode parDeclNode : node.getParamDeclListNode().getParamDeclListNode()){
+        String type = parDeclNode.getTypeDeclNode().getValue();
+        for(IdLeaf idLeaf : parDeclNode.getIdListNode().getIdListNode())
+          params.add(type);
+      }
 
-    for(ResultTypeNode resultTypeNode : node.getResultTypeListNode().getResultTypeListNode())
-      params.add(resultTypeNode.getTypeDeclNode().getValue());
+    int size = node.getResultTypeListNode().getResultTypeListNode().size();
+    ArrayList<ResultTypeNode> resultTypeNodes = node.getResultTypeListNode().getResultTypeListNode();
+
+    //CHECK deve esistere un solo void come parametro di ritorno.
+    int i = 0;
+    if(size == 1 && resultTypeNodes.get(i).isVoid()){
+      returns.add("void");
+      i++;
+    }
+
+    while(i < size){
+
+      if(resultTypeNodes.get(i).isVoid())
+        throw new ReturnParamsException(node.getIdLeaf().getValue());
+      else
+        returns.add(resultTypeNodes.get(i).getTypeDeclNode().getValue());
+
+      i++;
+    }
 
     TableStack.getHead().addToTable(node.getIdLeaf().getValue(),params,returns);
     TableStack.add(node.getSymbolTable());
+
+    if(node.getParamDeclListNode() != null)
+      node.getParamDeclListNode().accept(this);
+
+    node.getResultTypeListNode().accept(this);
+
+    if(node.getVarDeclListNode() != null)
+      node.getVarDeclListNode().accept(this);
+
+    if(node.getStatListNode() != null)
+      node.getStatListNode().accept(this);
+
+    if(node.getReturnExprsNode() != null)
+      node.getReturnExprsNode().accept(this);
+
+    System.out.println(node.getIdLeaf().getValue());
+    TableStack.printTables();
 
     TableStack.pop();
 
@@ -149,13 +358,16 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(ProgramNode node) {
+  public Object visit(ProgramNode node) throws Exception {
     TableStack.add(node.getSymbolTable());
 
     if( node.getVarDeclListNode() != null)
       node.getVarDeclListNode().accept(this);
 
     node.getProcListNode().accept(this);
+
+    System.out.println(node.getName());
+    TableStack.printTables();
 
     TableStack.pop();
 
@@ -178,17 +390,44 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(ReturnExprsNode node) {
+  public Object visit(ReturnExprsNode node) throws Exception {
+    node.getExprListNode().accept(this);
     return null;
   }
 
   @Override
-  public Object visit(StatListNode node) {
+  public Object visit(StatListNode node) throws Exception {
+
+    for (StatNode statNode : node.getStatListNode()){
+      if(statNode == null) continue;
+
+      if(statNode instanceof AssignStatNode){
+        ((AssignStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof CallProcNode){
+        ((CallProcNode) statNode).accept(this);
+      }
+      if(statNode instanceof IfStatNode){
+        ((IfStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof WhileStatNode){
+        ((WhileStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof WriteStatNode){
+        ((WriteStatNode) statNode).accept(this);
+      }
+      if(statNode instanceof ReadlnStatNode){
+        ((ReadlnStatNode) statNode).accept(this);
+      }
+
+    }
     return null;
   }
 
   @Override
   public Object visit(StringConstLeaf leaf) {
+    TableStack.getHead().addToTable(leaf.getValue(),Node.STRING_CONST);
+    leaf.setType(Node.STRING_CONST);
     return null;
   }
 
@@ -198,12 +437,42 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(VarDeclListNode node) {
+  public Object visit(VarDeclListNode node) throws Exception {
+
+    for(VarDeclNode varDeclNode : node.getVarDeclListNode())
+      varDeclNode.accept(this);
+
     return null;
   }
 
   @Override
-  public Object visit(VarDeclNode node) {
+  public Object visit(VarDeclNode node) throws Exception {
+
+    String type = node.getTypeDeclNode().getValue();
+
+    for(Object obj : node.getIdListInitNode().getIdListInitNode()){
+
+      if( obj instanceof IdLeaf){
+        TableStack.getHead().addToTable(((IdLeaf) obj).getValue(),type);
+        ((IdLeaf) obj).accept(this);
+      }
+      else if( obj instanceof AssignStatNode){
+        ArrayList<IdLeaf> idLeaves = ((AssignStatNode) obj).getIdListNode().getIdListNode();
+        ArrayList<ExprNode> exprNodes = ((AssignStatNode) obj).getExprListNode().getExprListNode();
+
+        if(idLeaves.size() == 1 && exprNodes.size() == 1){
+          TableStack.getHead().addToTable(idLeaves.get(0).getValue(),type);
+          idLeaves.get(0).accept(this);
+          exprNodes.get(0).accept(this);
+          if(!exprNodes.get(0).getType().contains(idLeaves.get(0).getType()))
+            throw new TypeMismatchException();
+        }
+        else
+          throw new TypeMismatchException();
+
+      }
+    }
+
     return null;
   }
 

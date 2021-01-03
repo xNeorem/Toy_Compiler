@@ -17,7 +17,7 @@ public class ProgramNode extends Node implements Visitable {
         this.symbolTable = new SymbolTable();
     }
     @Override
-    public Object accept(Visitor visitor) {
+    public Object accept(Visitor visitor)  throws Exception{
         return visitor.visit(this);
     }
 

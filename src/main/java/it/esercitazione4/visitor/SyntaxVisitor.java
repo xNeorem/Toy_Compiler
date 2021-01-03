@@ -110,7 +110,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(AssignStatNode node) {
+    public Object visit(AssignStatNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getIdListNode().accept(this));
         rootElement.appendChild((Element) node.getExprListNode().accept(this));
@@ -123,15 +123,16 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(CallProcNode node) {
+    public Object visit(CallProcNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getIdLeaf().accept(this));
-        rootElement.appendChild((Element) node.getExprListNode().accept(this));
+        if(node.getExprListNode() != null)
+            rootElement.appendChild((Element) node.getExprListNode().accept(this));
         return rootElement;
     }
 
     @Override
-    public Object visit(ElifListNode node) {
+    public Object visit(ElifListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (ElifNode elifNode : node.getElifListNode())
             rootElement.appendChild((Element) elifNode.accept(this));
@@ -140,7 +141,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ElifNode node) {
+    public Object visit(ElifNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getExprNode().accept(this));
         rootElement.appendChild((Element) node.getStatiListNode().accept(this));
@@ -148,14 +149,14 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ElseNode node) {
+    public Object visit(ElseNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getStatListNode().accept(this));
         return rootElement;
     }
 
     @Override
-    public Object visit(ExprListNode node) {
+    public Object visit(ExprListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (ExprNode exprNode : node.getExprListNode())
             rootElement.appendChild((Element) exprNode.accept(this));
@@ -164,7 +165,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ExprNode node) {
+    public Object visit(ExprNode node) throws Exception {
         String nodeName = node.getName();
         Element rootElement = null;
         switch (nodeName){
@@ -234,7 +235,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(IdListInitNode node) {
+    public Object visit(IdListInitNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (Object obj : node.getIdListInitNode()){
             if( obj instanceof IdLeaf){
@@ -249,7 +250,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(IdListNode node) {
+    public Object visit(IdListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (IdLeaf idLeaf : node.getIdListNode())
             rootElement.appendChild((Element) idLeaf.accept(this));
@@ -258,7 +259,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(IfStatNode node) {
+    public Object visit(IfStatNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getExprNode().accept(this));
         rootElement.appendChild((Element) node.getStatListNode().accept(this));
@@ -283,7 +284,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ParamDeclListNode node) {
+    public Object visit(ParamDeclListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (ParDeclNode parDeclNode : node.getParamDeclListNode())
             rootElement.appendChild((Element) parDeclNode.accept(this));
@@ -292,7 +293,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ParDeclNode node) {
+    public Object visit(ParDeclNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getTypeDeclNode().accept(this));
         rootElement.appendChild((Element) node.getIdListNode().accept(this));
@@ -301,7 +302,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ProcListNode node) {
+    public Object visit(ProcListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (ProcNode procNode : node.getProcListNode())
             rootElement.appendChild((Element) procNode.accept(this));
@@ -310,7 +311,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ProcNode node) {
+    public Object visit(ProcNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getIdLeaf().accept(this));
 
@@ -332,7 +333,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ProgramNode node) {
+    public Object visit(ProgramNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         if( node.getVarDeclListNode() != null)
             rootElement.appendChild((Element) node.getVarDeclListNode().accept(this));
@@ -344,7 +345,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ReadlnStatNode node) {
+    public Object visit(ReadlnStatNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getIdListNode().accept(this));
 
@@ -352,7 +353,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ResultTypeListNode node) {
+    public Object visit(ResultTypeListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (ResultTypeNode resultTypeNode : node.getResultTypeListNode())
             rootElement.appendChild((Element) resultTypeNode.accept(this));
@@ -361,7 +362,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ResultTypeNode node) {
+    public Object visit(ResultTypeNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         if(node.isVoid())
             rootElement.setAttribute("value","void");
@@ -373,7 +374,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(ReturnExprsNode node) {
+    public Object visit(ReturnExprsNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getExprListNode().accept(this));
 
@@ -381,7 +382,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(StatListNode node) {
+    public Object visit(StatListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (StatNode statNode : node.getStatListNode()){
             if(statNode == null) continue;
@@ -427,7 +428,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(VarDeclListNode node) {
+    public Object visit(VarDeclListNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         for (VarDeclNode varDeclNode : node.getVarDeclListNode())
             rootElement.appendChild((Element) varDeclNode.accept(this));
@@ -436,7 +437,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(VarDeclNode node) {
+    public Object visit(VarDeclNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getTypeDeclNode().accept(this));
         rootElement.appendChild((Element) node.getIdListInitNode().accept(this));
@@ -446,7 +447,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(WhileStatNode node) {
+    public Object visit(WhileStatNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         if(node.getStatListNode1() != null)
             rootElement.appendChild((Element) node.getStatListNode1().accept(this));
@@ -459,7 +460,7 @@ public class SyntaxVisitor implements Visitor{
     }
 
     @Override
-    public Object visit(WriteStatNode node) {
+    public Object visit(WriteStatNode node) throws Exception {
         Element rootElement = doc.createElement(node.getName());
         rootElement.appendChild((Element) node.getExprListNode().accept(this));
 
