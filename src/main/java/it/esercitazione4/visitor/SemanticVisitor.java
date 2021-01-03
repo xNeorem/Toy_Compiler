@@ -564,11 +564,14 @@ public class SemanticVisitor implements Visitor{
     key = new KeyOpTypes(Node.BOOLEAN_CONST,Node.BOOLEAN_CONST,Node.OR_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
-    //< <= == > >=, BOOLEAN, BOOLEAN -> BOOLEAN
+    //< <= != == > >=, BOOLEAN, BOOLEAN -> BOOLEAN
     key = new KeyOpTypes(Node.BOOLEAN_CONST,Node.BOOLEAN_CONST,Node.LT_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.BOOLEAN_CONST,Node.BOOLEAN_CONST,Node.LE_OP);
+    opTypes2.put(key,Node.BOOLEAN_CONST);
+
+    key = new KeyOpTypes(Node.BOOLEAN_CONST,Node.BOOLEAN_CONST,Node.NE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.BOOLEAN_CONST,Node.BOOLEAN_CONST,Node.EQ_OP);
@@ -580,11 +583,14 @@ public class SemanticVisitor implements Visitor{
     key = new KeyOpTypes(Node.BOOLEAN_CONST,Node.BOOLEAN_CONST,Node.GE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
-    //< <= == > >=, INTEGER, INTEGER -> BOOLEAN
+    //< <= != == > >=, INTEGER, INTEGER -> BOOLEAN
     key = new KeyOpTypes(Node.INT_CONST,Node.INT_CONST,Node.LT_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.INT_CONST,Node.INT_CONST,Node.LE_OP);
+    opTypes2.put(key,Node.BOOLEAN_CONST);
+
+    key = new KeyOpTypes(Node.INT_CONST,Node.INT_CONST,Node.NE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.INT_CONST,Node.INT_CONST,Node.EQ_OP);
@@ -603,6 +609,9 @@ public class SemanticVisitor implements Visitor{
     key = new KeyOpTypes(Node.INT_CONST,Node.FLOAT_CONST,Node.LE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
+    key = new KeyOpTypes(Node.INT_CONST,Node.FLOAT_CONST,Node.NE_OP);
+    opTypes2.put(key,Node.BOOLEAN_CONST);
+
     key = new KeyOpTypes(Node.INT_CONST,Node.FLOAT_CONST,Node.EQ_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
@@ -612,11 +621,14 @@ public class SemanticVisitor implements Visitor{
     key = new KeyOpTypes(Node.INT_CONST,Node.FLOAT_CONST,Node.GE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
-    //< <= == > >=, FLOAT, FLOAT -> BOOLEAN
+    //< <= != == > >=, FLOAT, FLOAT -> BOOLEAN
     key = new KeyOpTypes(Node.FLOAT_CONST,Node.FLOAT_CONST,Node.LT_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.FLOAT_CONST,Node.FLOAT_CONST,Node.LE_OP);
+    opTypes2.put(key,Node.BOOLEAN_CONST);
+
+    key = new KeyOpTypes(Node.FLOAT_CONST,Node.FLOAT_CONST,Node.NE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.FLOAT_CONST,Node.FLOAT_CONST,Node.EQ_OP);
@@ -628,11 +640,14 @@ public class SemanticVisitor implements Visitor{
     key = new KeyOpTypes(Node.FLOAT_CONST,Node.FLOAT_CONST,Node.GE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
-    //< <= == > >=, STRING, STRING -> BOOLEAN
+    //< <= != == > >=, STRING, STRING -> BOOLEAN
     key = new KeyOpTypes(Node.STRING_CONST,Node.STRING_CONST,Node.LT_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.STRING_CONST,Node.STRING_CONST,Node.LE_OP);
+    opTypes2.put(key,Node.BOOLEAN_CONST);
+
+    key = new KeyOpTypes(Node.STRING_CONST,Node.STRING_CONST,Node.NE_OP);
     opTypes2.put(key,Node.BOOLEAN_CONST);
 
     key = new KeyOpTypes(Node.STRING_CONST,Node.STRING_CONST,Node.EQ_OP);

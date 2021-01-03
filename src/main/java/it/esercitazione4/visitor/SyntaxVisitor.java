@@ -56,44 +56,6 @@ public class SyntaxVisitor implements Visitor{
         dBuilder = dbFactory.newDocumentBuilder();
         doc = dBuilder.newDocument();
     }
-/*
-    @Override
-    public Object visit(Object node) {
-        switch(((Node) node).getName()) {
-            case Node.ASSIGN_OP: break;
-            case Node.BOOLEAN_CONST: break;
-            case Node.CALL_PROC_OP: break;
-            case Node.ELIF_LIST_OP: break;
-            case Node.ELIF_OP: break;
-            case Node.ELSE_OP: break;
-            case Node.EXPR_LIST_OP: break;
-            case Node.EXPR_OP: break;
-            case Node.FLOAT_CONST: break;
-            case Node.ID: break;
-            case Node.ID_LIST_INIT_OP: break;
-            case Node.ID_LIST_OP: break;
-            case Node.IF_OP: break;
-            case Node.INT_CONST: break;
-            case Node.NULL_CONST: break;
-            case Node.PARAM_DECL_LIST_OP: break;
-            case Node.PAR_DECL_OP: break;
-            case Node.PROC_LIST_OP: break;
-            case Node.PROC_OP: break;
-            case Node.PROGRAM_OP: break;
-            case Node.READ_OP: break;
-            case Node.RESULT_TYPE_LIST_OP: break;
-            case Node.RESULT_TYPE: break;
-            case Node.RETURN_EXPRS_OP: break;
-            case Node.STAT_LIST_OP: break;
-            case Node.STRING_CONST: break;
-            case Node.TYPE_DECL: break;
-            case Node.VAR_DECL_LIST_OP: break;
-            case Node.VAR_DECL_OP: break;
-            case Node.WHILE_OP: break;
-            case Node.WRITE_OP: break;
-        }
-        return null;
-    }*/
 
     public void saveXML(String name) throws TransformerException {
         // write the content into xml file

@@ -1,6 +1,7 @@
 package it.esercitazione4;
 
 import it.esercitazione4.nodes.ProgramNode;
+import it.esercitazione4.visitor.ClangVisitor;
 import it.esercitazione4.visitor.SemanticVisitor;
 import it.esercitazione4.visitor.SyntaxVisitor;
 
@@ -22,9 +23,11 @@ public class Tester {
         semanticVisitor.visit(result);
         System.out.println("SemanticVisitor done");
 
-        visitor = new SyntaxVisitor();
-        visitor.visit(result);
-        visitor.saveXML(args[0]);
-        System.out.println("filexml done");
+        System.out.println("ClangVisitor starting...");
+        ClangVisitor clangVisitor = new ClangVisitor();
+        clangVisitor.visit(result);
+        clangVisitor.saveC("cFile.c");
+        System.out.println("ClangVisitor done");
+
     }
 }
