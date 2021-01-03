@@ -32,6 +32,8 @@ import it.esercitazione4.nodes.VarDeclListNode;
 import it.esercitazione4.nodes.VarDeclNode;
 import it.esercitazione4.nodes.WhileStatNode;
 import it.esercitazione4.nodes.WriteStatNode;
+import it.esercitazione4.symboltable.TableStack;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class NewSemanticVisitor implements Visitor{
@@ -128,11 +130,35 @@ public class NewSemanticVisitor implements Visitor{
 
   @Override
   public Object visit(ProcNode node) {
+    ArrayList<String> params = new ArrayList<>();
+    ArrayList<String> returns = new ArrayList<>();
+
+    if(node.getParamDeclListNode() != null)
+      for(ParDeclNode parDeclNode : node.getParamDeclListNode().getParamDeclListNode())
+        params.add(parDeclNode.getTypeDeclNode().getValue());
+
+    for(ResultTypeNode resultTypeNode : node.getResultTypeListNode().getResultTypeListNode())
+      params.add(resultTypeNode.getTypeDeclNode().getValue());
+
+    TableStack.getHead().addToTable(node.getIdLeaf().getValue(),params,returns);
+    TableStack.add(node.getSymbolTable());
+
+    TableStack.pop();
+
     return null;
   }
 
   @Override
   public Object visit(ProgramNode node) {
+    TableStack.add(node.getSymbolTable());
+
+    if( node.getVarDeclListNode() != null)
+      node.getVarDeclListNode().accept(this);
+
+    node.getProcListNode().accept(this);
+
+    TableStack.pop();
+
     return null;
   }
 

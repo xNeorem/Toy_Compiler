@@ -24,8 +24,8 @@ public  class TableStack{
     return stack.peek();
   }
 
-  public static void add(SymbolTable node){
-    stack.add(node);
+  public static void add(SymbolTable symbolTable){
+    stack.add(symbolTable);
   }
 
   public static SymbolTable pop(){

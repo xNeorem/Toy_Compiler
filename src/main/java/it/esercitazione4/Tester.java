@@ -1,6 +1,8 @@
 package it.esercitazione4;
 
 import it.esercitazione4.nodes.ProgramNode;
+import it.esercitazione4.symboltable.TableStack;
+import it.esercitazione4.visitor.NewSemanticVisitor;
 import it.esercitazione4.visitor.SyntaxVisitor;
 
 import java.io.FileReader;
@@ -15,15 +17,15 @@ public class Tester {
         visitor.visit(result);
         visitor.saveXML(args[0]);
         System.out.println("SyntaxVisitor done");
-/*
+
         System.out.println("SemanticVisitor starting...");
-        SemanticVisitor semanticVisitor = new SemanticVisitor();
+        NewSemanticVisitor semanticVisitor = new NewSemanticVisitor();
         semanticVisitor.visit(result);
         System.out.println("SemanticVisitor done");
 
         while(TableStack.size() != 0){
             System.out.println(TableStack.getHead());
-            TableStack.getHead().getSymbolTable().symbolTable.entrySet().forEach(entry->{
+            TableStack.getHead().symbolTable.entrySet().forEach(entry->{
                 System.out.println(entry.getKey() + " -> " + entry.getValue());
             });
 
@@ -32,7 +34,7 @@ public class Tester {
         }
         visitor = new SyntaxVisitor();
         visitor.visit(result);
-        visitor.saveFileXML("file1.xml");
-        System.out.println("filexml done");*/
+        visitor.saveXML("file1.xml");
+        System.out.println("filexml done");
     }
 }

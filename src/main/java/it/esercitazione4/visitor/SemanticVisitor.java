@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class SemanticVisitor {
-
+/*
     @Override
     public Object visit(Visitable node) throws Exception {
         VisitableNode<Node> rootNode = (VisitableNode<Node>) node;
@@ -99,7 +99,7 @@ public class SemanticVisitor {
 
 
 
-        /*
+
 
          if(rootNode.data().getName().equals(VisitableNode.PROC_OP)) {
             rootNode.data().getSymbolTable().addToTable()
@@ -109,7 +109,7 @@ public class SemanticVisitor {
             VisitableNode<Node> currentNode = childs.next();
             String nameCurrentNode = currentNode.data().getName();
 
-        }*/
+        }
         return null;
     }
 
@@ -238,6 +238,6 @@ public class SemanticVisitor {
             return true;
 
         return false;
-    }
+    }*/
 
 }
