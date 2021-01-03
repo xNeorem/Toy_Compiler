@@ -54,8 +54,7 @@ public class NewSemanticVisitor implements Visitor{
     ArrayList<ExprNode> exprNodes = node.getExprListNode().getExprListNode();
 
 
-    int size = exprNodes.size();
-    int j = 0;
+    int size = idLeaves.size();
 
     for (int i = 0; i < size; i++){
 
@@ -66,14 +65,14 @@ public class NewSemanticVisitor implements Visitor{
             Arrays.asList(callProcNode.getType().split(", ")));
 
         for(String returns : returnsCall){
-          if(idLeaves.get(j).getType().equals(returns))
-            j++;
+          if(idLeaves.get(i).getType().equals(returns) && i<size)
+            i++;
           else
             throw new TypeMismatchException();
         }
 
 
-      } else if (!exprNodes.get(i).getType().contains(idLeaves.get(j).getType())) {
+      } else if (!exprNodes.get(i).getType().contains(idLeaves.get(i).getType())) {
         throw new TypeMismatchException();
       }
     }
@@ -127,17 +126,24 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(ElifListNode node) {
+  public Object visit(ElifListNode node) throws Exception {
+    for(ElifNode elifNode : node.getElifListNode())
+      elifNode.accept(this);
     return null;
   }
 
   @Override
-  public Object visit(ElifNode node) {
+  public Object visit(ElifNode node) throws Exception {
+    node.getExprNode().accept(this);
+    if(!node.getExprNode().getType().equals(Node.BOOLEAN_CONST))
+      throw new TypeMismatchException();
+    node.getStatiListNode().accept(this);
     return null;
   }
 
   @Override
-  public Object visit(ElseNode node) {
+  public Object visit(ElseNode node) throws Exception {
+    node.getStatListNode().accept(this);
     return null;
   }
 
@@ -253,7 +259,15 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(IfStatNode node) {
+  public Object visit(IfStatNode node) throws Exception {
+    node.getExprNode().accept(this);
+    if(!node.getExprNode().getType().equals(Node.BOOLEAN_CONST))
+      throw new TypeMismatchException();
+    node.getStatListNode().accept(this);
+    if(node.getElifListNode() != null)
+      node.getElifListNode().accept(this);
+    if(node.getElseNode() != null)
+      node.getElseNode().accept(this);
     return null;
   }
 
@@ -369,18 +383,24 @@ public class NewSemanticVisitor implements Visitor{
     System.out.println(node.getName());
     TableStack.printTables();
 
+    if(TableStack.lookUp("main") == null)
+      throw new Exception("Main non presente.");
+
     TableStack.pop();
 
     return null;
   }
 
   @Override
-  public Object visit(ReadlnStatNode node) {
+  public Object visit(ReadlnStatNode node) throws Exception {
+    node.getIdListNode().accept(this);
     return null;
   }
 
   @Override
-  public Object visit(ResultTypeListNode node) {
+  public Object visit(ResultTypeListNode node) throws Exception {
+    for(ResultTypeNode resultTypeNode : node.getResultTypeListNode())
+      resultTypeNode.accept(this);
     return null;
   }
 
@@ -477,12 +497,22 @@ public class NewSemanticVisitor implements Visitor{
   }
 
   @Override
-  public Object visit(WhileStatNode node) {
+  public Object visit(WhileStatNode node) throws Exception {
+
+    node.getExprNode().accept(this);
+    if(!node.getExprNode().getType().equals(Node.BOOLEAN_CONST))
+      throw new TypeMismatchException();
+
+    if(node.getStatListNode1() != null)
+      node.getStatListNode1().accept(this);
+
+    node.getStatListNode2().accept(this);
     return null;
   }
 
   @Override
-  public Object visit(WriteStatNode node) {
+  public Object visit(WriteStatNode node) throws Exception {
+    node.getExprListNode().accept(this);
     return null;
   }
 

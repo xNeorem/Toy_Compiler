@@ -17,7 +17,7 @@ corp;
 
 
 proc writeNewLines(int n)void :
-	while n >0 do
+	while n > 0 do
 		write("\n");
 		n := n -1;
 	od;
@@ -26,7 +26,7 @@ corp;
 
 
 proc main()void :
-	int a, b, c:=0;
+	int a, b, c;
 	a, b, c := multAddDiff();
 	write ("Ciao ", nome);
 	writeNewLines(2);

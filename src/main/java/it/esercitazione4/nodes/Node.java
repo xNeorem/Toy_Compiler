@@ -1,5 +1,7 @@
 package it.esercitazione4.nodes;
 
+import java_cup.runtime.Symbol;
+
 public class Node {
     protected String name;
     protected boolean isLeaf = false;
