@@ -363,8 +363,8 @@ public class SemanticVisitor implements Visitor{
     if(node.getReturnExprsNode() != null)
       node.getReturnExprsNode().accept(this);
 
-    System.out.println(node.getIdLeaf().getValue());
-    TableStack.printTables();
+    //System.out.println(node.getIdLeaf().getValue());
+    //TableStack.printTables();
 
     TableStack.pop();
 
@@ -380,8 +380,8 @@ public class SemanticVisitor implements Visitor{
 
     node.getProcListNode().accept(this);
 
-    System.out.println(node.getName());
-    TableStack.printTables();
+    //System.out.println(node.getName());
+    //TableStack.printTables();
 
     if(TableStack.lookUp("main") == null)
       throw new Exception("Main non presente.");

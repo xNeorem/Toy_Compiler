@@ -36,13 +36,14 @@ public class ClangVisitor implements Visitor{
             Arrays.asList(callProcNode.getType().split(", ")));
 
         code += "void *array["+returnsCall.size()+"];";
-        code += "array = "+callProcNode.getIdLeaf().accept(this);
+        //code += "array = "+callProcNode.getIdLeaf().accept(this);
+        code += callProcNode.getIdLeaf().accept(this);
 
 
         String functionName = callProcNode.getIdLeaf().getValue();
 
         if(TableStack.lookUp(functionName).getTypeOutput().size() > 1){
-          code +="(array,";
+          code +="(array";
         }else{
           code += "(";
         }
@@ -435,7 +436,7 @@ public class ClangVisitor implements Visitor{
   @Override
   public Object visit(TypeDeclNode node) throws Exception {
     if(node.getValue().equals("string"))
-      return "char[] ";
+      return "char ";
     return node.getValue() + " ";
   }
 
@@ -450,18 +451,23 @@ public class ClangVisitor implements Visitor{
   @Override
   public Object visit(VarDeclNode node) throws Exception {
     String code = "";
-    code += (String) node.getTypeDeclNode().accept(this);
+    String type = (String) node.getTypeDeclNode().accept(this);
+    code += type;
     //code += (String) node.getIdListInitNode().accept(this);
     for(Object obj : node.getIdListInitNode().getIdListInitNode()){
 
       if(obj instanceof IdLeaf){
         code += (String) ((IdLeaf)obj).accept(this);
+        if(type.equals("char "))
+          code += "[]";
       }
 
       else if(obj instanceof AssignStatNode){
         ArrayList<IdLeaf> idLeaves = ((AssignStatNode) obj).getIdListNode().getIdListNode();
         ArrayList<ExprNode> exprNodes = ((AssignStatNode) obj).getExprListNode().getExprListNode();
         code += (String) idLeaves.get(0).accept(this);
+        if(type.equals("char "))
+          code += "[]";
         code += ClangVisitor.operators.get(Node.ASSIGN_OP);
         code += (String) exprNodes.get(0).accept(this);
       }
@@ -501,7 +507,7 @@ public class ClangVisitor implements Visitor{
 
   public void saveC(String fileName){
     try {
-      FileWriter myWriter = new FileWriter(fileName);
+      FileWriter myWriter = new FileWriter(fileName.substring(0, fileName.length()-4).split("/")[3]+ ".c");
       myWriter.write(clangCode);
       myWriter.close();
       System.out.println("Successfully wrote to the file.");

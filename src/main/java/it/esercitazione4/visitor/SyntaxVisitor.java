@@ -65,7 +65,7 @@ public class SyntaxVisitor implements Visitor{
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         DOMSource source = new DOMSource(doc);
 
-        StreamResult result = new StreamResult(new File(name.substring(0, name.length()-4).split("/")[1]+ ".xml"));
+        StreamResult result = new StreamResult(new File(name.substring(0, name.length()-4).split("/")[3]+ ".xml"));
         transformer.transform(source, result);
 
         System.out.println("File saved!");
