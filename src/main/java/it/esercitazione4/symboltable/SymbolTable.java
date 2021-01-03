@@ -1,5 +1,6 @@
 package it.esercitazione4.symboltable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SymbolTable {
@@ -19,7 +20,7 @@ public class SymbolTable {
     return true;
   }
 
-  public boolean addToTable(String symbol, String[] typeInput, String[] typeOutput){
+  public boolean addToTable(String symbol, ArrayList<String> typeInput, ArrayList<String> typeOutput){
     if(this.symbolTable.containsKey(symbol))
       return false;
     this.symbolTable.put(symbol,new EntrySymbolTable(symbol,typeInput,typeOutput));

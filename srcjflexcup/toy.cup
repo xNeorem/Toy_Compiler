@@ -1,34 +1,37 @@
 package it.esercitazione4;
 
 import java.util.ArrayList;
-import it.esercitazione4.visitor.*;
+import it.esercitazione4.nodes.*;
 import java_cup.runtime.*;
 
-parser code {:
-       public VisitableNode<Node> makeNode(String name, VisitableNode<Node> ... childrens){
-                Node node = new Node(name);
-                VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
-               for(int i = 0; i < childrens.length; i ++){
-                   toReturn.add(childrens[i]);
-               }
-               return toReturn;
-           }
+parser code {::}
 
-         public VisitableNode<Node> makeNode(String name, ArrayList<VisitableNode<Node>> childrens){
-
-                    Node node = new Node(name);
-                    VisitableNode<Node> toReturn = new VisitableNode<Node>(node);
-
-                    for (VisitableNode<Node> nodeChild : childrens)
-                       toReturn.add(nodeChild);
-
-                   return toReturn;
-            }
- :}
-
-nonterminal VisitableNode<Node> Expr, ExprList, IdList, CallProc, WriteStat, AssignStat, ReadlnStat, Type,
-            ResultType,ResultTypeList, ParDecl, IdListInit, ReturnExprs, VarDecl, ParamDeclList, VarDeclList, IfStat,
-            ElifList, Elif, Else, WhileStat, StatList, Stat, Proc, Program, ProcList;
+nonterminal ExprNode Expr;
+nonterminal ExprListNode ExprList;
+nonterminal IdListNode IdList;
+nonterminal CallProcNode CallProc;
+nonterminal WriteStatNode WriteStat;
+nonterminal AssignStatNode AssignStat;
+nonterminal ReadlnStatNode ReadlnStat;
+nonterminal TypeDeclNode Type;
+nonterminal ResultTypeNode ResultType;
+nonterminal ResultTypeListNode ResultTypeList;
+nonterminal ParDeclNode ParDecl;
+nonterminal IdListInitNode IdListInit;
+nonterminal ReturnExprsNode ReturnExprs;
+nonterminal VarDeclNode VarDecl;
+nonterminal ParamDeclListNode ParamDeclList;
+nonterminal VarDeclListNode VarDeclList;
+nonterminal IfStatNode IfStat;
+nonterminal ElifListNode ElifList;
+nonterminal ElifNode Elif;
+nonterminal ElseNode Else;
+nonterminal WhileStatNode WhileStat;
+nonterminal StatListNode StatList;
+nonterminal StatNode Stat;
+nonterminal ProcNode Proc;
+nonterminal ProgramNode Program;
+nonterminal ProcListNode ProcList;
 
 terminal SEMI, INT, BOOL, FLOAT, STRING, COMMA, ASSIGN, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, FI, ELIF, ELSE,
     WHILE, DO, OD, READ, WRITE, TRUE, FALSE, NULL, PLUS, MINUS, TIMES, DIV, AND, OR,
@@ -45,248 +48,199 @@ precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
 
-Program ::= VarDeclList:vdl ProcList:pl {:RESULT = makeNode(VisitableNode.PROGRAM_OP,vdl,pl);  :};
+Program ::= VarDeclList:vdl ProcList:pl {:RESULT = new ProgramNode(vdl,pl); :}
+;
 
 VarDeclList ::=
-/* empty */ {: :}
-| VarDecl:vd VarDeclList:vds {: ArrayList<VisitableNode<Node>> new_vds = new ArrayList<VisitableNode<Node>>();
+/* empty */ {: RESULT = null; :}
+| VarDecl:vd VarDeclList:vds {: ArrayList<VarDeclNode> new_vds = new ArrayList<>();
                                 if(vds != null) {
-                                    new_vds.addAll(((ArrayList<VisitableNode<Node>>) vds.data().getValue()));
+                                    new_vds.addAll(vds.getVarDeclListNode());
                                 }
                                 new_vds.add(0, vd);
-                                VisitableNode<Node> vdsNode = makeNode(VisitableNode.VAR_DECL_LIST_OP);
-                                vdsNode.data().setValue(new_vds);
-                                RESULT = vdsNode;
+                                RESULT = new VarDeclListNode(new_vds);
                                 :}
 ;
 
-ProcList ::= Proc:p {: RESULT = makeNode(VisitableNode.PROC_LIST_OP);
-                     ArrayList<VisitableNode<Node>> ps = new ArrayList<VisitableNode<Node>>();
+ProcList ::= Proc:p {: ArrayList<ProcNode> ps = new ArrayList<>();
                      ps.add(p);
-                     RESULT.data().setValue(ps); :}
-	| Proc:p ProcList:ps {: ((ArrayList<VisitableNode<Node>>) ps.data().getValue()).add(0, p);
+                     RESULT = new ProcListNode(ps);
+                     :}
+	| Proc:p ProcList:ps {: ps.getProcListNode().add(0, p);
                         RESULT = ps;
                       :}
 ;
 
-VarDecl ::= Type:t IdListInit:i SEMI {: RESULT = makeNode(VisitableNode.VAR_DECL_OP, t, i);  :}
+VarDecl ::= Type:t IdListInit:i SEMI {: RESULT = new VarDeclNode(t, i);  :}
 ;
 
-Type ::= INT {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
-                                             node.data().setValue("int");
-                                             RESULT = node;  :}
-    | BOOL {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
-                                             node.data().setValue("bool");
-                                             RESULT = node;   :}
-    | FLOAT {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
-                                             node.data().setValue("float");
-                                             RESULT = node;  :}
-    | STRING {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
-                                             node.data().setValue("string");
-                                             RESULT = node;  :}
+Type ::= INT {: RESULT = new TypeDeclNode("int");  :}
+        | BOOL {: RESULT = new TypeDeclNode("bool");  :}
+        | FLOAT {: RESULT = new TypeDeclNode("float");  :}
+        | STRING {: RESULT = new TypeDeclNode("string");  :}
 ;
-IdListInit ::= ID:id {: RESULT = makeNode(VisitableNode.ID_LIST_INIT_OP);
-                        VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                        idNode.data().setValue(id);
-                        ArrayList<VisitableNode<Node>> ids = new ArrayList<VisitableNode<Node>>();
-                        ids.add(idNode);
-                        RESULT.data().setValue(ids); :}
-    | IdListInit:i COMMA ID:id {:   VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                                    idNode.data().setValue(id);
-                                    ((ArrayList<VisitableNode<Node>>) i.data().getValue()).add(idNode);
-                                    RESULT = i; :}
+IdListInit ::= ID:id {: ArrayList<Object> ids = new ArrayList<>();
+                        ids.add(new IdLeaf(id));
+                        RESULT = new IdListInitNode(ids);
+                        :}
+    | IdListInit:i COMMA ID:id {:  i.getIdListInitNode().add(new IdLeaf(id));
+                                    RESULT = i;
+                                :}
     /*int a=5, b, c, d*/
-	| ID:id ASSIGN Expr:e {: RESULT = makeNode(VisitableNode.ID_LIST_INIT_OP);
-                             VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                             idNode.data().setValue(id);
-                             VisitableNode<Node> assignNode = makeNode(VisitableNode.ASSIGN_OP, idNode, e);
-                             ArrayList<VisitableNode<Node>> ids = new ArrayList<VisitableNode<Node>>();
-                             ids.add(assignNode);
-                             RESULT.data().setValue(ids); :}
+	| ID:id ASSIGN Expr:e {:  ArrayList<Object> ids = new ArrayList<>();
+	                          ArrayList<IdLeaf> idLeafs = new ArrayList<>();
+	                          ArrayList<ExprNode> exprNodes = new ArrayList<>();
+	                          idLeafs.add(new IdLeaf(id));
+	                          exprNodes.add(e);
+                            ids.add(new AssignStatNode(new IdListNode(idLeafs),new ExprListNode(exprNodes)));
+                            RESULT = new IdListInitNode(ids);
+                          :}
 	/*int a, b=2, c, d*/
-	| IdListInit:i COMMA ID:id ASSIGN Expr:e {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                                                idNode.data().setValue(id);
-                                                VisitableNode<Node> assignNode = makeNode(VisitableNode.ASSIGN_OP, idNode, e);
-                                                ((ArrayList<VisitableNode<Node>>) i.data().getValue()).add(assignNode);
-                                                RESULT = i; :}
+	| IdListInit:i COMMA ID:id ASSIGN Expr:e {:   ArrayList<IdLeaf> idLeafs = new ArrayList<>();
+                                                ArrayList<ExprNode> exprNodes = new ArrayList<>();
+                                                idLeafs.add(new IdLeaf(id));
+                                                exprNodes.add(e);
+	                                             i.getIdListInitNode().add(new AssignStatNode(new IdListNode(idLeafs),new ExprListNode(exprNodes)));
+                                               RESULT = i;
+                                           :}
 ;
 Proc ::= PROC ID:id LPAR ParamDeclList:pdl RPAR ResultTypeList:rtl COLON
 		VarDeclList:vdl StatList:st RETURN ReturnExprs:re CORP SEMI {:
-		VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                            idNode.data().setValue(id);
-		RESULT = makeNode(VisitableNode.PROC_OP, idNode, pdl, rtl, vdl, st, re);
+		RESULT = new ProcNode(new IdLeaf(id), pdl, rtl, vdl, st, re);
 		:}
 	| PROC ID:id LPAR RPAR ResultTypeList:rtl COLON
 		VarDeclList:vdl StatList:st RETURN ReturnExprs:re CORP SEMI {:
-        VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                              idNode.data().setValue(id);
-        RESULT = makeNode(VisitableNode.PROC_OP, idNode, rtl, vdl, st, re);
+        RESULT = new ProcNode( new IdLeaf(id), rtl, vdl, st, re);
         :}
     | PROC ID:id LPAR ParamDeclList:pdl RPAR ResultTypeList:rtl COLON
             VarDeclList:vdl RETURN ReturnExprs:re CORP SEMI {:
-             VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                                 idNode.data().setValue(id);
-             RESULT = makeNode(VisitableNode.PROC_OP, idNode, pdl, rtl, vdl, re);
+             RESULT = new ProcNode(new IdLeaf(id), pdl, rtl, vdl, re);
              :}
     | PROC ID:id LPAR RPAR ResultTypeList:rtl COLON
         VarDeclList:vdl RETURN ReturnExprs:re CORP SEMI {:
-            VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                                  idNode.data().setValue(id);
-            RESULT = makeNode(VisitableNode.PROC_OP, idNode, rtl, vdl, re);
+            RESULT = new ProcNode(new IdLeaf(id), rtl, vdl, re);
             :}
 ;
-ResultTypeList ::= ResultType:rt {: VisitableNode<Node> rts_node = makeNode(VisitableNode.RESULT_TYPE_LIST_OP);
-                                            ArrayList<VisitableNode<Node>> rts = new ArrayList<VisitableNode<Node>>();
-                                            rts.add(rt);
-                                            rts_node.data().setValue(rts);
-                                            RESULT = rts_node;
-                                            :}
-	| ResultType:rt COMMA ResultTypeList:rts {: ((ArrayList<VisitableNode<Node>>) rts.data().getValue()).add(0, rt);
+ResultTypeList ::= ResultType:rt {: ArrayList<ResultTypeNode> rts = new ArrayList<>();
+                                    rts.add(rt);
+                                    RESULT = new ResultTypeListNode(rts);
+                                 :}
+	| ResultType:rt COMMA ResultTypeList:rts {: rts.getResultTypeListNode().add(0, rt);
 	                                            RESULT = rts;
 	                                         :}
 ;
-ReturnExprs::=  ExprList:e {: RESULT = makeNode(VisitableNode.RETURN_EXPRS_OP, e);  :}
-	| /* empty */ {: :}
+ReturnExprs::=  ExprList:e {: RESULT = new ReturnExprsNode(e);  :}
+	| /* empty */ {: RESULT = null; :}
 ;
 
-ExprList ::= Expr:e {: RESULT = makeNode(VisitableNode.EXPR_LIST_OP);
-                       ArrayList<VisitableNode<Node>> expressions = new ArrayList<VisitableNode<Node>>();
+ExprList ::= Expr:e {: ArrayList<ExprNode> expressions = new ArrayList<>();
                        expressions.add(e);
-                       RESULT.data().setValue(expressions); :}
-	| Expr:e COMMA ExprList:exprs {: ((ArrayList<VisitableNode<Node>>) exprs.data().getValue()).add(0, e);
+                       RESULT = new ExprListNode(expressions); :}
+	| Expr:e COMMA ExprList:exprs {: exprs.getExprListNode().add(0, e);
 	                                RESULT = exprs;
 	                              :}
 ;
 
-ParamDeclList ::= ParDecl:pd {: RESULT = makeNode(VisitableNode.PARAM_DECL_LIST_OP);
-                                ArrayList<VisitableNode<Node>> pds = new ArrayList<VisitableNode<Node>>();
+ParamDeclList ::= ParDecl:pd {: ArrayList<ParDeclNode> pds = new ArrayList<>();
                                 pds.add(pd);
-                                RESULT.data().setValue(pds); :}
-    | ParamDeclList:pds SEMI ParDecl:pd {: ((ArrayList<VisitableNode<Node>>) pds.data().getValue()).add(pd);
+                                RESULT = new ParamDeclListNode(pds); :}
+    | ParamDeclList:pds SEMI ParDecl:pd {: pds.getParamDeclListNode().add(pd);
                                            RESULT = pds;
                                          :}
 ;
 
-ParDecl ::= Type:t IdList:ids {: RESULT = makeNode(VisitableNode.PAR_DECL_OP, t, ids); :}
+ParDecl ::= Type:t IdList:ids {: RESULT = new ParDeclNode(t, ids); :}
 ;
 
-IdList ::= ID:id {: VisitableNode<Node> ids_node = makeNode(VisitableNode.ID_LIST_OP);
-                    VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                    idNode.data().setValue(id);
-                    ArrayList<VisitableNode<Node>> ids = new ArrayList<VisitableNode<Node>>();
+IdList ::= ID:id {: IdLeaf idNode = new IdLeaf(id);
+                    ArrayList<IdLeaf> ids = new ArrayList<>();
                     ids.add(idNode);
-                    ids_node.data().setValue(ids);
-                    RESULT = ids_node;
+                    RESULT = new IdListNode(ids);
                     :}
-    | IdList:ids COMMA ID:id {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                                idNode.data().setValue(id);
-                                ((ArrayList<VisitableNode<Node>>) ids.data().getValue()).add(0, idNode);
+    | IdList:ids COMMA ID:id {: IdLeaf idNode = new IdLeaf(id);
+                                ids.getIdListNode().add(0, idNode);
                                 RESULT = ids;
                                 :}
 ;
 
-ResultType ::= Type:e {: RESULT = makeNode(VisitableNode.RESULT_TYPE,e);  :}
-    | VOID {: VisitableNode<Node> node = makeNode(VisitableNode.TYPE_DECL);
-                                         node.data().setValue("void");
-                                         RESULT = makeNode(VisitableNode.RESULT_TYPE,node);   :}
+ResultType ::= Type:e {: RESULT = new ResultTypeNode(e);  :}
+              | VOID {: RESULT = new ResultTypeNode();   :}
 ;
 
-StatList ::= Stat:e SEMI  {: VisitableNode<Node> stms_node = makeNode(VisitableNode.STAT_LIST_OP);
-                                     ArrayList<VisitableNode<Node>> stms = new ArrayList<VisitableNode<Node>>();
+StatList ::= Stat:e SEMI  {:         ArrayList<StatNode> stms = new ArrayList<>();
                                      stms.add(e);
-                                     stms_node.data().setValue(stms);
-                                     RESULT = stms_node;
+                                     RESULT = new StatListNode(stms);
                                      :}
 
-    | Stat:st SEMI StatList:stms {: ((ArrayList<VisitableNode<Node>>) stms.data().getValue()).add(0, st);
-                               RESULT = stms; :}
+    | Stat:st SEMI StatList:stms {: stms.getStatListNode().add(0, st);
+                                    RESULT = stms; :}
 ;
 
-Stat ::= IfStat:e {: RESULT = e;  :}
-	| WhileStat:e {: RESULT = e;  :}
-	| ReadlnStat:e {: RESULT = e;  :}
-	| WriteStat:e {: RESULT = e;  :}
-	| AssignStat:e {: RESULT = e;  :}
-	| CallProc:e {: RESULT = e;  :}
+Stat ::= IfStat:e {: RESULT = (StatNode) e;  :}
+	| WhileStat:e {: RESULT = (StatNode) e;  :}
+	| ReadlnStat:e {: RESULT = (StatNode) e;  :}
+	| WriteStat:e {: RESULT = (StatNode) e;  :}
+	| AssignStat:e {: RESULT = (StatNode) e;  :}
+	| CallProc:e {: RESULT = (StatNode) e;  :}
 ;
 
-IfStat ::= IF Expr:e THEN StatList:stms ElifList:els Else:el FI {: RESULT = makeNode(VisitableNode.IF_OP, e, stms, els, el); :}
+IfStat ::= IF Expr:e THEN StatList:stms ElifList:els Else:el FI {: RESULT = new IfStatNode(e, stms, els, el); :}
 ;
 
-ElifList ::= /* empty */ {: :}
-	| Elif:el ElifList:els {: ArrayList<VisitableNode<Node>> new_els = new ArrayList<VisitableNode<Node>>();
+ElifList ::= /* empty */ {: RESULT = null; :}
+	| Elif:el ElifList:els {: ArrayList<ElifNode> new_els = new ArrayList<>();
                               if(els != null) {
-                                  new_els.addAll(((ArrayList<VisitableNode<Node>>) els.data().getValue()));
+                                  new_els.addAll(els.getElifListNode());
                               }
                               new_els.add(0, el);
-                              VisitableNode<Node> elsNode = makeNode(VisitableNode.ELIF_LIST_OP);
-                              elsNode.data().setValue(new_els);
-                              RESULT = elsNode;
+                              RESULT = new ElifListNode(new_els);
                               :}
 ;
 
-Elif ::= ELIF Expr:e THEN StatList:stms {: RESULT = makeNode(VisitableNode.ELIF_OP, e, stms); :}
+Elif ::= ELIF Expr:e THEN StatList:stms {: RESULT = new ElifNode( e, stms); :}
 ;
 
-Else ::= /* empty */ {: :}
-    | ELSE StatList:stms {: RESULT = makeNode(VisitableNode.ELSE_OP, stms); :}
+Else ::= /* empty */ {: RESULT = null; :}
+        | ELSE StatList:stms {: RESULT = new ElseNode(stms); :}
 ;
 
-WhileStat ::= WHILE StatList:stms1 RETURN Expr:e DO StatList:stms2 OD {: RESULT = makeNode(VisitableNode.WHILE_OP, e, stms1, stms2); :}
-	| WHILE Expr:e DO StatList:stms OD {: RESULT = makeNode(VisitableNode.WHILE_OP, e, stms); :}
+WhileStat ::= WHILE StatList:stms1 RETURN Expr:e DO StatList:stms2 OD {: RESULT = new WhileStatNode( stms1, e, stms2); :}
+	          | WHILE Expr:e DO StatList:stms OD {: RESULT = new WhileStatNode( e, stms); :}
 ;
 
-ReadlnStat ::= READ LPAR IdList:ids RPAR {: RESULT = makeNode(VisitableNode.READ_OP,ids);  :}
+ReadlnStat ::= READ LPAR IdList:ids RPAR {: RESULT = new ReadlnStatNode(ids);  :}
 ;
 
-WriteStat ::=  WRITE LPAR ExprList:exprs RPAR {: RESULT = makeNode(VisitableNode.WRITE_OP,exprs); :}
+WriteStat ::=  WRITE LPAR ExprList:exprs RPAR {: RESULT = new WriteStatNode(exprs); :}
 ;
 
-AssignStat ::= IdList:ids ASSIGN  ExprList:exprs {: RESULT = makeNode(VisitableNode.ASSIGN_OP, ids, exprs); :}
+AssignStat ::= IdList:ids ASSIGN  ExprList:exprs {: RESULT = new AssignStatNode(ids, exprs); :}
 ;
 
-CallProc ::= ID:id LPAR ExprList:exprs RPAR {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                                      idNode.data().setValue(id);
-                                      RESULT = makeNode(VisitableNode.CALL_PROC_OP, idNode, exprs); :}
-	| ID:id LPAR RPAR {: VisitableNode<Node> idNode = makeNode(VisitableNode.ID);
-                         idNode.data().setValue(id);
-                         RESULT = makeNode(VisitableNode.CALL_PROC_OP, idNode); :}
+CallProc ::= ID:id LPAR ExprList:exprs RPAR {: RESULT = new CallProcNode(new IdLeaf(id), exprs); :}
+	         | ID:id LPAR RPAR {: RESULT = new CallProcNode(new IdLeaf(id)); :}
 ;
 
-Expr ::= NULL {: VisitableNode<Node> node = makeNode(VisitableNode.NULL_CONST);
-                          	                 node.data().setValue("null");
-                          	                 RESULT = node; :}
-	| TRUE {: VisitableNode<Node> node = makeNode(VisitableNode.TRUE_CONST);
-                                        	                 node.data().setValue("true");
-                                        	                 RESULT = node;  :}
-	| FALSE {: VisitableNode<Node> node = makeNode(VisitableNode.FALSE_CONST);
-                                         	                 node.data().setValue("false");
-                                         	                 RESULT = node;  :}
-	| INT_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.INT_CONST);
-	                 node.data().setValue(e);
-	                 RESULT = node; :}
-	| FLOAT_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.FLOAT_CONST);
-                    	                 node.data().setValue(e);
-                    	                 RESULT = node; :}
-	| STRING_CONST:e {: VisitableNode<Node> node = makeNode(VisitableNode.STRING_CONST);
-                     	                 node.data().setValue(e);
-                     	                 RESULT = node; :}
-	| ID:e {: VisitableNode<Node> node = makeNode(VisitableNode.ID);
-           	                 node.data().setValue(e);
-           	                 RESULT = node; :}
-    | CallProc:e {: RESULT = e;  :}
-	| Expr:e1 PLUS Expr:e2 {: RESULT = makeNode(VisitableNode.ADD_OP,e1,e2); :}
-	| Expr:e1 MINUS Expr:e2 {: RESULT = makeNode(VisitableNode.DIFF_OP,e1,e2); :}
-	| Expr:e1 TIMES Expr:e2 {: RESULT = makeNode(VisitableNode.MUL_OP,e1,e2); :}
-	| Expr:e1 DIV Expr:e2 {: RESULT = makeNode(VisitableNode.DIV_OP,e1,e2); :}
-	| Expr:e1 AND Expr:e2 {: RESULT = makeNode(VisitableNode.AND_OP,e1,e2); :}
-	| Expr:e1 OR Expr:e2 {: RESULT = makeNode(VisitableNode.OR_OP,e1,e2); :}
-	| Expr:e1 GT Expr:e2 {: RESULT = makeNode(VisitableNode.GT_OP,e1,e2); :}
-	| Expr:e1 GE Expr:e2 {: RESULT = makeNode(VisitableNode.GE_OP,e1,e2); :}
-	| Expr:e1 LT Expr:e2 {: RESULT = makeNode(VisitableNode.LT_OP,e1,e2); :}
-	| Expr:e1 LE Expr:e2 {: RESULT = makeNode(VisitableNode.LE_OP,e1,e2); :}
-	| Expr:e1 EQ Expr:e2 {: RESULT = makeNode(VisitableNode.EQ_OP,e1,e2); :}
-	| Expr:e1 NE Expr:e2 {: RESULT = makeNode(VisitableNode.NE_OP,e1,e2);  :}
-	| MINUS Expr:e {: RESULT = makeNode(VisitableNode.UMINUS_OP,e);  :} %prec UMINUS
-	| NOT Expr:e {: RESULT = makeNode(VisitableNode.NOT_OP,e);  :}
+  Expr ::= NULL {: RESULT = new ExprNode(Node.NULL_CONST,new NullConstLeaf()); :}
+	| TRUE {: RESULT = new ExprNode(Node.TRUE_CONST,new BoolConstLeaf(true)); :}
+	| FALSE {: RESULT = new ExprNode(Node.FALSE_CONST,new BoolConstLeaf(false)); :}
+	| INT_CONST:e {: RESULT = new ExprNode(Node.INT_CONST,new IntConstLeaf(e)); :}
+	| FLOAT_CONST:e {: RESULT = new ExprNode(Node.FLOAT_CONST,new FloatConstLeaf(e)); :}
+	| STRING_CONST:e {: RESULT = new ExprNode(Node.STRING_CONST,new StringConstLeaf(e)); :}
+	| ID:e {: RESULT = new ExprNode(Node.ID ,new IdLeaf(e)); :}
+  | CallProc:e {: RESULT = new ExprNode(Node.CALL_PROC_OP,e);  :}
+	| Expr:e1 PLUS Expr:e2 {: RESULT = new ExprNode(Node.ADD_OP,e1,e2); :}
+	| Expr:e1 MINUS Expr:e2 {: RESULT = new ExprNode(Node.DIFF_OP,e1,e2); :}
+	| Expr:e1 TIMES Expr:e2 {: RESULT = new ExprNode(Node.MUL_OP,e1,e2); :}
+	| Expr:e1 DIV Expr:e2 {: RESULT = new ExprNode(Node.DIV_OP,e1,e2); :}
+	| Expr:e1 AND Expr:e2 {: RESULT = new ExprNode(Node.AND_OP,e1,e2); :}
+	| Expr:e1 OR Expr:e2 {: RESULT = new ExprNode(Node.OR_OP,e1,e2); :}
+	| Expr:e1 GT Expr:e2 {: RESULT = new ExprNode(Node.GT_OP,e1,e2); :}
+	| Expr:e1 GE Expr:e2 {: RESULT = new ExprNode(Node.GE_OP,e1,e2); :}
+	| Expr:e1 LT Expr:e2 {: RESULT = new ExprNode(Node.LT_OP,e1,e2); :}
+	| Expr:e1 LE Expr:e2 {: RESULT = new ExprNode(Node.LE_OP,e1,e2); :}
+	| Expr:e1 EQ Expr:e2 {: RESULT = new ExprNode(Node.EQ_OP,e1,e2); :}
+	| Expr:e1 NE Expr:e2 {: RESULT = new ExprNode(Node.NE_OP,e1,e2);  :}
+	| MINUS Expr:e {: RESULT = new ExprNode(Node.UMINUS_OP,e);  :} %prec UMINUS
+	| NOT Expr:e {: RESULT = new ExprNode(Node.NOT_OP,e); :}
 ;

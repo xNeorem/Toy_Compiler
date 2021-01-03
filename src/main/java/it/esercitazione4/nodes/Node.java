@@ -1,41 +1,50 @@
-package it.esercitazione4.visitor;
+package it.esercitazione4.nodes;
 
-import com.scalified.tree.multinode.ArrayMultiTreeNode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java_cup.runtime.Symbol;
 
-public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable {
+public class Node {
+    protected String name;
+    protected boolean isLeaf = false;
+    protected String type;
 
-    public VisitableNode(T data) {
-        super(data);
+    public Node() {
+        this.name = Node.NODE_BASE;
     }
 
-    @Override
-    public Object accept(Visitor visitor) throws Exception {
-        return visitor.visit(this);
+    public String getName() {
+        return name;
     }
 
-
-    public VisitableNode<T> firstChild(){
-        return (VisitableNode<T>) this.subtrees().toArray()[0];
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public ArrayList<VisitableNode<Node>> getSubtree(){
-      List<VisitableNode<Node>> list = Arrays.asList((VisitableNode<Node>[])this.subtrees().toArray());
-      return new ArrayList<>(list);
+    public boolean isLeaf() {
+        return isLeaf;
     }
 
-    public int numChild(){
-        return this.subtrees().size();
+    public void setLeaf(boolean leaf) {
+        isLeaf = leaf;
     }
 
-    public VisitableNode<T> getChild(int i ){
-        return (VisitableNode<T>) this.subtrees().toArray()[i];
+    public String getType() {
+      return type;
     }
 
+    public void setType(String type) {
+      this.type = type;
+    }
 
-    public static final String
+  @Override
+  public String toString() {
+    return "Node{" +
+        "name='" + name + '\'' +
+        ", isLeaf=" + isLeaf +
+        ", type='" + type + '\'' +
+        '}';
+  }
+
+  public static final String
             UMINUS_OP = "UminusOp",
             ADD_OP = "AddOp",
             MUL_OP = "MulOp",
@@ -48,17 +57,16 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             GE_OP = "GEOp",
             LT_OP = "LTOp",
             LE_OP = "LEOp",
-            NE_OP = "LEOp",
+            NE_OP = "NEOp",
             EQ_OP = "EQOp",
 
-            INT_CONST = "int_const",
-            FLOAT_CONST = "float_const",
-            STRING_CONST = "string_const",
+            INT_CONST = "int",
+            FLOAT_CONST = "float",
+            STRING_CONST = "string",
+            BOOLEAN_CONST = "boolean",
             NULL_CONST = "null",
             TRUE_CONST = "true",
             FALSE_CONST = "false",
-            BOOLEAN_CONST = "bool",
-            VOID_CONST = "void",
 
             TYPE_DECL = "TypeDecl",
             RESULT_TYPE = "ResultType",
@@ -88,8 +96,7 @@ public class VisitableNode<T> extends ArrayMultiTreeNode<T> implements Visitable
             ID_LIST_OP = "IdListOp",
             ID_LIST_INIT_OP = "IdListInitOp",
 
-            RETURN_EXPRS_OP = "ReturnExprsOp",
-
-            ERROR = "Error";
-
+            EXPR_OP = "ExprOp",
+            NODE_BASE = "NodeBase",
+            RETURN_EXPRS_OP = "ReturnExprsOp";
 }
