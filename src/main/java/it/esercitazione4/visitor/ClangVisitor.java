@@ -7,6 +7,7 @@ import it.esercitazione4.symboltable.TableStack;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class ClangVisitor implements Visitor{
@@ -19,10 +20,58 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(AssignStatNode node) throws Exception {
+
     String code = "";
-    code += (String) node.getIdListNode().accept(this);
-    code += ClangVisitor.operators.get(Node.ASSIGN_OP);
-    code += (String) node.getExprListNode().accept(this);
+
+    ArrayList<IdLeaf> idLeaves = node.getIdListNode().getIdListNode();
+    ArrayList<ExprNode> exprNodes = node.getExprListNode().getExprListNode();
+    int size = idLeaves.size();
+
+    for (int i = 0; i < size; i++){
+
+      if (exprNodes.get(i).getName().equals(Node.CALL_PROC_OP)) {
+
+        CallProcNode callProcNode = (CallProcNode) exprNodes.get(i).getValue1();
+        ArrayList<String> returnsCall = new ArrayList<String>(
+            Arrays.asList(callProcNode.getType().split(", ")));
+
+        code += "void *array["+returnsCall.size()+"];";
+        code += "array = "+callProcNode.getIdLeaf().accept(this);
+
+
+        String functionName = callProcNode.getIdLeaf().getValue();
+
+        if(TableStack.lookUp(functionName).getTypeOutput().size() > 1){
+          code +="(array,";
+        }else{
+          code += "(";
+        }
+
+        if(callProcNode.getExprListNode() != null){
+          for(ExprNode exprNode: callProcNode.getExprListNode().getExprListNode())
+            code += exprNode.accept(this) + ",";
+          code = code.substring(0,code.length() - 1);
+        }
+        code+=");";
+
+
+        for(int j = 0; j < returnsCall.size(); j++){
+          String type = idLeaves.get(i).getType();
+          if(type.equals("string"))
+            type = "char[]";
+
+          code += idLeaves.get(i).accept(this) + " = "+ "*("+type+"*)array["+j+"];";
+
+          i++;
+        }
+
+        //code += "free(array);";
+
+
+      } else {
+        code += idLeaves.get(i).accept(this) + "=" + exprNodes.get(i).accept(this) + ";";
+      }
+    }
     return code;
   }
 
@@ -39,6 +88,7 @@ public class ClangVisitor implements Visitor{
       code += String.format("(%s)", (String)node.getExprListNode().accept(this));
     else
       code += "()";
+    code += ";";
     return code;
   }
 
@@ -190,11 +240,10 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(ParamDeclListNode node) throws Exception {
-    String code = "(";
+    String code = "";
     for (ParDeclNode parDeclNode : node.getParamDeclListNode())
       code += parDeclNode.accept(this);
     //code = code.substring(0, code.length()-1);
-    code += ")";
     return code;
   }
 
@@ -220,19 +269,36 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(ProcNode node) throws Exception {
-    String functionName = node.getName();
     String code = "";
 
     TableStack.add(node.getSymbolTable());
 
-    code += (String) node.getResultTypeListNode().accept(this);
+    ArrayList<String> returnsCall = new ArrayList<String>(
+        Arrays.asList(((String) node.getResultTypeListNode().accept(this)).split(" ")));
 
-    code += (String) node.getIdLeaf().accept(this);
-
-    if(node.getParamDeclListNode() != null)
-      code += (String) node.getParamDeclListNode().accept(this);
+    if(returnsCall.size() == 1)
+      code += (String) node.getResultTypeListNode().accept(this);
     else
-      code += "()";
+      code += "void ";
+
+    String functionName = (String) node.getIdLeaf().accept(this);
+    if(functionName.equals("main"))
+      functionName = "main_func";
+    code += functionName;
+
+    if(returnsCall.size() > 1){
+      code += "(void** array";
+    }
+    else{
+      code += "(";
+    }
+
+    if(node.getParamDeclListNode() != null){
+      if(returnsCall.size() > 1)
+        code += ",";
+      code += (String) node.getParamDeclListNode().accept(this);
+    }
+    code += ")";
 
     code += "{";
 
@@ -242,8 +308,28 @@ public class ClangVisitor implements Visitor{
     if(node.getStatListNode() != null)
       code += (String) node.getStatListNode().accept(this);
 
-    if(node.getReturnExprsNode() != null)
+    if(node.getReturnExprsNode() != null && returnsCall.size() == 1)
       code += (String) node.getReturnExprsNode().accept(this);
+
+    else if(returnsCall.size() > 1){
+      int i = 0;
+      for (ExprNode exprNode : node.getReturnExprsNode().getExprListNode().getExprListNode()){
+        code += "array["+i+"]"+" = &"+exprNode.accept(this)+";";
+        i++;
+      }
+    }
+
+    /*else if(returnsCall.size() > 1){
+      code += "void *array = (void*)malloc("+returnsCall.size()+" * sizeof(void)); \n"
+          + "    if (array == NULL) { \n"
+          + "        printf(\"Memory not allocated.\\n\"); \n"
+          + "        exit(0); \n"
+          + "    } ";
+      code += "void *ptr = array";
+
+
+    }*/
+
 
     code += "}\n";
 
@@ -256,6 +342,7 @@ public class ClangVisitor implements Visitor{
     TableStack.add(node.getSymbolTable());
     String code = "#include <stdio.h>\n";
     code += "#include <string.h>\n";
+    code += "#include <stdlib.h>\n";
     code += "#define null ((char *)0)\n";
     code += "#define true 1\n";
     code += "#define false 0\n";
@@ -264,6 +351,11 @@ public class ClangVisitor implements Visitor{
       code += (String) node.getVarDeclListNode().accept(this);
 
     code += (String) node.getProcListNode().accept(this);
+
+    code += "int main(){\n"
+        + "    main_func();\n"
+        + "    return 0;\n"
+        + "}";
     clangCode = code;
     TableStack.pop();
     return null;
@@ -304,7 +396,7 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(ReturnExprsNode node) throws Exception {
-    return "return " + (String) node.getExprListNode().accept(this);
+    return "return " + (String) node.getExprListNode().accept(this) + ";";
   }
 
   @Override
@@ -337,11 +429,13 @@ public class ClangVisitor implements Visitor{
 
   @Override
   public Object visit(StringConstLeaf leaf) throws Exception {
-    return leaf.getValue() + " ";
+    return leaf.getValue().replace("\n","\\n") + " ";
   }
 
   @Override
   public Object visit(TypeDeclNode node) throws Exception {
+    if(node.getValue().equals("string"))
+      return "char[] ";
     return node.getValue() + " ";
   }
 
