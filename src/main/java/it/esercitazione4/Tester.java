@@ -1,8 +1,7 @@
 package it.esercitazione4;
 
 import it.esercitazione4.nodes.ProgramNode;
-import it.esercitazione4.symboltable.TableStack;
-import it.esercitazione4.visitor.NewSemanticVisitor;
+import it.esercitazione4.visitor.SemanticVisitor;
 import it.esercitazione4.visitor.SyntaxVisitor;
 
 import java.io.FileReader;
@@ -19,7 +18,7 @@ public class Tester {
         System.out.println("SyntaxVisitor done");
 
         System.out.println("SemanticVisitor starting...");
-        NewSemanticVisitor semanticVisitor = new NewSemanticVisitor();
+        SemanticVisitor semanticVisitor = new SemanticVisitor();
         semanticVisitor.visit(result);
         System.out.println("SemanticVisitor done");
 
