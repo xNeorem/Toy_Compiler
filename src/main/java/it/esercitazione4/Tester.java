@@ -26,8 +26,8 @@ public class Tester {
         System.out.println("ClangVisitor starting...");
         ClangVisitor clangVisitor = new ClangVisitor();
         clangVisitor.visit(result);
-        clangVisitor.saveC(args[0]);
+        String filePath = clangVisitor.saveC(args[0]);
         System.out.println("ClangVisitor done");
-
+        Runtime.getRuntime().exec("./Toy2C.sh " + filePath);
     }
 }

@@ -158,7 +158,7 @@ IdList ::= ID:id {: IdLeaf idNode = new IdLeaf(id);
                     RESULT = new IdListNode(ids);
                     :}
     | IdList:ids COMMA ID:id {: IdLeaf idNode = new IdLeaf(id);
-                                ids.getIdListNode().add(0, idNode);
+                                ids.getIdListNode().add(idNode);
                                 RESULT = ids;
                                 :}
 ;

@@ -89,7 +89,7 @@ public class ClangVisitor implements Visitor{
       code += String.format("(%s)", (String)node.getExprListNode().accept(this));
     else
       code += "()";
-    code += ";";
+    //code += ";";
     return code;
   }
 
@@ -105,17 +105,17 @@ public class ClangVisitor implements Visitor{
   public Object visit(ElifNode node) throws Exception {
     String code = "else if(";
     code += (String) node.getExprNode().accept(this);
-    code += "){\n";
+    code += "){";
     code += (String) node.getStatiListNode().accept(this);
-    code += "}\n";
+    code += "}";
     return code;
   }
 
   @Override
   public Object visit(ElseNode node) throws Exception {
-    String code = "else {\n";
+    String code = "else {";
     code += (String) node.getStatListNode().accept(this);
-    code += "}\n";
+    code += "}";
     return code;
   }
 
@@ -123,8 +123,9 @@ public class ClangVisitor implements Visitor{
   public Object visit(ExprListNode node) throws Exception {
     String code = "";
     for (ExprNode exprNode : node.getExprListNode()) {
-      code += (String) exprNode.accept(this);
+      code += (String) exprNode.accept(this) + ", ";
     }
+    code = code.substring(0, code.length()-2);
     return code;
   }
 
@@ -219,9 +220,9 @@ public class ClangVisitor implements Visitor{
   public Object visit(IfStatNode node) throws Exception {
     String code = "if(";
     code += (String) node.getExprNode().accept(this);
-    code += "){\n";
+    code += "){";
     code += (String) node.getStatListNode().accept(this);
-    code += "}\n";
+    code += "}";
     if(node.getElifListNode() != null)
       code += (String) node.getElifListNode().accept(this);
     if(node.getElseNode() != null)
@@ -244,7 +245,7 @@ public class ClangVisitor implements Visitor{
     String code = "";
     for (ParDeclNode parDeclNode : node.getParamDeclListNode())
       code += parDeclNode.accept(this);
-    //code = code.substring(0, code.length()-1);
+    code = code.substring(0, code.length()-2);
     return code;
   }
 
@@ -256,7 +257,7 @@ public class ClangVisitor implements Visitor{
       code += type;
       code += (String) idLeaf.accept(this)  + ", ";
     }
-    code = code.substring(0, code.length()-2);
+    //code = code.substring(0, code.length()-2);
     return code;
   }
 
@@ -321,10 +322,10 @@ public class ClangVisitor implements Visitor{
     }
 
     /*else if(returnsCall.size() > 1){
-      code += "void *array = (void*)malloc("+returnsCall.size()+" * sizeof(void)); \n"
-          + "    if (array == NULL) { \n"
-          + "        printf(\"Memory not allocated.\\n\"); \n"
-          + "        exit(0); \n"
+      code += "void *array = (void*)malloc("+returnsCall.size()+" * sizeof(void)); "
+          + "    if (array == NULL) { "
+          + "        printf(\"Memory not allocated.\\n\"); "
+          + "        exit(0); "
           + "    } ";
       code += "void *ptr = array";
 
@@ -332,7 +333,7 @@ public class ClangVisitor implements Visitor{
     }*/
 
 
-    code += "}\n";
+    code += "}";
 
     TableStack.pop();
     return code;
@@ -353,9 +354,9 @@ public class ClangVisitor implements Visitor{
 
     code += (String) node.getProcListNode().accept(this);
 
-    code += "int main(){\n"
-        + "    main_func();\n"
-        + "    return 0;\n"
+    code += "int main(){"
+        + "    main_func();"
+        + "    return 0;"
         + "}";
     clangCode = code;
     TableStack.pop();
@@ -410,7 +411,7 @@ public class ClangVisitor implements Visitor{
         code += (String) ((AssignStatNode) statNode).accept(this);
       }
       if(statNode instanceof CallProcNode){
-        code += (String) ((CallProcNode) statNode).accept(this);
+        code += (String) ((CallProcNode) statNode).accept(this) + ";";
       }
       if(statNode instanceof IfStatNode){
         code += (String) ((IfStatNode) statNode).accept(this);
@@ -486,7 +487,7 @@ public class ClangVisitor implements Visitor{
       code += (String) node.getStatListNode1().accept(this);
     code += "while(" + (String) node.getExprNode().accept(this) + "){";
     code += (String) node.getStatListNode2().accept(this);
-    code += "}\n";
+    code += "}";
     return code;
   }
 
@@ -505,16 +506,19 @@ public class ClangVisitor implements Visitor{
     return code;
   }
 
-  public void saveC(String fileName){
+  public String saveC(String fileName){
+    String cname = fileName.substring(0, fileName.length()-4).split("/")[3]+ ".c";
     try {
-      FileWriter myWriter = new FileWriter(fileName.substring(0, fileName.length()-4).split("/")[3]+ ".c");
+      FileWriter myWriter = new FileWriter(cname);
       myWriter.write(clangCode);
       myWriter.close();
+      //Runtime.getRuntime().exec("java -jar /Users/salvatorefasano/.m2/repository/com/github/abrarsyed/jastyle/jAstyle/1.3/jAstyle-1.3.jar " + cname);
       System.out.println("Successfully wrote to the file.");
     } catch (IOException e) {
       System.out.println("An error occurred.");
       e.printStackTrace();
     }
+    return cname;
   }
 
   public static final HashMap<String, String> operators = new HashMap<>();

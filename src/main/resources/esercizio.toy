@@ -9,7 +9,7 @@ proc calc(int scelta; float a,b)float:
             result := a / b;
         else
             write("Impossibile\n");
-            result := 0;
+            result := 0.0;
         fi;
     fi;
 
@@ -28,7 +28,7 @@ proc main()void :
         write("2) Sottrazione\n");
         write("3) Motiplicazione\n");
         write("4) Divisione\n");
-        write("\n Scelta:");
+        write("\nScelta:");
         readln(scelta);
 
 
