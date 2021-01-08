@@ -523,7 +523,10 @@ public class ClangVisitor implements Visitor{
   private static final String generateTempVariable(){
     int i = 0;
     String temp = String.format("t_%d",i);
-    while (TableStack.lookUp(temp) != null) i++;
+    while (TableStack.lookUp(temp) != null)
+      temp = String.format("t_%d",++i);
+
+    TableStack.getHead().addToTable(temp,"TEMP");
 
     return temp;
   }
