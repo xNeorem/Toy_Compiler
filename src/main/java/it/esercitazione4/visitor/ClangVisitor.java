@@ -35,7 +35,14 @@ public class ClangVisitor implements Visitor{
         ArrayList<String> returnsCall = new ArrayList<String>(
             Arrays.asList(callProcNode.getType().split(", ")));
 
-        code += "void *array["+returnsCall.size()+"];";
+        String temp_param = ClangVisitor.generateTempVariable();
+
+        //code += "void *array["+returnsCall.size()+"];";
+        code += "    void **"+temp_param+" = (void **)malloc(sizeof(void *) * "+returnsCall.size()+");"
+            + "     if ("+temp_param+" == NULL) {"
+            + "        printf(\"Memory not allocated for return values.\");"
+            + "        exit(0);"
+            + "    }";
         //code += "array = "+callProcNode.getIdLeaf().accept(this);
         code += callProcNode.getIdLeaf().accept(this);
 
@@ -43,7 +50,7 @@ public class ClangVisitor implements Visitor{
         String functionName = callProcNode.getIdLeaf().getValue();
 
         if(TableStack.lookUp(functionName).getTypeOutput().size() > 1){
-          code +="(array";
+          code +="(" + temp_param;
         }else{
           code += "(";
         }
@@ -61,12 +68,12 @@ public class ClangVisitor implements Visitor{
           if(type.equals("string"))
             type = "char[]";
 
-          code += idLeaves.get(i).accept(this) + " = "+ "*("+type+"*)array["+j+"];";
+          code += idLeaves.get(i).accept(this) + " = "+ "*("+type+"*)"+temp_param+"["+j+"];";
 
           i++;
         }
 
-        //code += "free(array);";
+        code += "free("+temp_param+");";
 
 
       } else {
@@ -288,8 +295,10 @@ public class ClangVisitor implements Visitor{
       functionName = "main_func";
     code += functionName;
 
+    String temp_param = ClangVisitor.generateTempVariable();
+
     if(returnsCall.size() > 1){
-      code += "(void** array";
+      code += "(void** " + temp_param;
     }
     else{
       code += "(";
@@ -316,21 +325,11 @@ public class ClangVisitor implements Visitor{
     else if(returnsCall.size() > 1){
       int i = 0;
       for (ExprNode exprNode : node.getReturnExprsNode().getExprListNode().getExprListNode()){
-        code += "array["+i+"]"+" = &"+exprNode.accept(this)+";";
+        code += temp_param+"["+i+"]"+" = &"+exprNode.accept(this)+";";
         i++;
       }
     }
 
-    /*else if(returnsCall.size() > 1){
-      code += "void *array = (void*)malloc("+returnsCall.size()+" * sizeof(void)); "
-          + "    if (array == NULL) { "
-          + "        printf(\"Memory not allocated.\\n\"); "
-          + "        exit(0); "
-          + "    } ";
-      code += "void *ptr = array";
-
-
-    }*/
 
 
     code += "}";
@@ -521,6 +520,13 @@ public class ClangVisitor implements Visitor{
     return cname;
   }
 
+  private static final String generateTempVariable(){
+    int i = 0;
+    String temp = String.format("t_%d",i);
+    while (TableStack.lookUp(temp) != null) i++;
+
+    return temp;
+  }
   public static final HashMap<String, String> operators = new HashMap<>();
   static {
     operators.put(Node.ADD_OP, "+");
