@@ -35,26 +35,14 @@ public class ClangVisitor implements Visitor{
         ArrayList<String> returnsCall = new ArrayList<String>(
             Arrays.asList(callProcNode.getType().split(", ")));
 
-        String temp_param = ClangVisitor.generateTempVariable();
-
-        //code += "void *array["+returnsCall.size()+"];";
-        code += "    void **"+temp_param+" = (void **)malloc(sizeof(void *) * "+returnsCall.size()+");"
-            + "     if ("+temp_param+" == NULL) {"
-            + "        printf(\"Memory not allocated for return values.\");"
-            + "        exit(0);"
-            + "    }";
         //code += "array = "+callProcNode.getIdLeaf().accept(this);
-        code += callProcNode.getIdLeaf().accept(this);
-
-
-        String functionName = callProcNode.getIdLeaf().getValue();
-
-        if(TableStack.lookUp(functionName).getTypeOutput().size() > 1){
-          code +="(" + temp_param;
-        }else{
-          code += "(";
+        String temp_param = null;
+        if(returnsCall.size() > 1){
+          temp_param = ClangVisitor.generateTempVariable();
+          code += "void** "+ temp_param + "=";
         }
-
+        code += callProcNode.getIdLeaf().accept(this);
+        code += "(";
         if(callProcNode.getExprListNode() != null){
           for(ExprNode exprNode: callProcNode.getExprListNode().getExprListNode())
             code += exprNode.accept(this) + ",";
@@ -62,18 +50,20 @@ public class ClangVisitor implements Visitor{
         }
         code+=");";
 
+        if(returnsCall.size() > 1){
 
-        for(int j = 0; j < returnsCall.size(); j++){
-          String type = idLeaves.get(i).getType();
-          if(type.equals("string"))
-            type = "char[]";
+          for(int j = 0; j < idLeaves.size(); j++){
+            String type = idLeaves.get(i).getType();
+            if(type.equals("string"))
+              type = "char*";
 
-          code += idLeaves.get(i).accept(this) + " = "+ "*("+type+"*)"+temp_param+"["+j+"];";
+            code += idLeaves.get(i).accept(this) + " = "+ "*("+type+"*)"+temp_param+"["+j+"];";
 
-          i++;
+            i++;
+          }
+
+          code += "free("+temp_param+");";
         }
-
-        code += "free("+temp_param+");";
 
 
       } else {
@@ -288,33 +278,35 @@ public class ClangVisitor implements Visitor{
     if(returnsCall.size() == 1)
       code += (String) node.getResultTypeListNode().accept(this);
     else
-      code += "void ";
+      code += "void** ";
 
     String functionName = (String) node.getIdLeaf().accept(this);
     if(functionName.equals("main"))
       functionName = "main_func";
     code += functionName;
 
-    String temp_param = ClangVisitor.generateTempVariable();
+    code += "(";
 
-    if(returnsCall.size() > 1){
-      code += "(void** " + temp_param;
-    }
-    else{
-      code += "(";
-    }
 
-    if(node.getParamDeclListNode() != null){
-      if(returnsCall.size() > 1)
-        code += ",";
+    if(node.getParamDeclListNode() != null)
       code += (String) node.getParamDeclListNode().accept(this);
-    }
-    code += ")";
-
-    code += "{";
+    code += "){";
 
     if(node.getVarDeclListNode() != null)
       code += (String) node.getVarDeclListNode().accept(this);
+
+    String temp_param = null;
+    if(returnsCall.size() > 1){
+
+      temp_param = ClangVisitor.generateTempVariable();
+      //code += "void *array["+returnsCall.size()+"];";
+      code += "    void **"+temp_param+" = (void **)malloc(sizeof(void *) * "+returnsCall.size()+");"
+          + "     if ("+temp_param+" == NULL) {"
+          + "        printf(\"Memory not allocated for return values.\");"
+          + "        exit(0);"
+          + "    }";
+
+    }
 
     if(node.getStatListNode() != null)
       code += (String) node.getStatListNode().accept(this);
@@ -328,6 +320,7 @@ public class ClangVisitor implements Visitor{
         code += temp_param+"["+i+"]"+" = &"+exprNode.accept(this)+";";
         i++;
       }
+      code += "return "+temp_param+";";
     }
 
 
@@ -345,7 +338,7 @@ public class ClangVisitor implements Visitor{
     code += "#include <string.h>\n";
     code += "#include <stdlib.h>\n";
     code += "#include <stdbool.h>\n";
-    code += "#define null ((char *)0)\n";
+    code += "#define null NULL\n";
 
     if(node.getVarDeclListNode() != null)
       code += (String) node.getVarDeclListNode().accept(this);

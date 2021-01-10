@@ -65,10 +65,13 @@ public class SemanticVisitor implements Visitor{
             Arrays.asList(callProcNode.getType().split(", ")));
 
         for(String returns : returnsCall){
-          if(idLeaves.get(i).getType().equals(returns) && i<size)
-            i++;
-          else
-            throw new TypeMismatchException();
+          if(i < size){
+            if (idLeaves.get(i).getType().equals(returns)) {
+              i++;
+            } else {
+              throw new TypeMismatchException();
+            }
+          }
         }
 
 
@@ -360,8 +363,17 @@ public class SemanticVisitor implements Visitor{
     if(node.getStatListNode() != null)
       node.getStatListNode().accept(this);
 
-    if(node.getReturnExprsNode() != null)
+    if(node.getReturnExprsNode() != null){
       node.getReturnExprsNode().accept(this);
+      ArrayList<ExprNode> exprNodes = node.getReturnExprsNode().getExprListNode().getExprListNode();
+
+      if(exprNodes.size() != returns.size())
+        throw new ReturnParamsException(node.getIdLeaf().getValue());
+      for (int j = 0; j < exprNodes.size(); j++){
+        if(!returns.get(j).equals(exprNodes.get(j).getType()))
+          throw new ReturnParamsException(node.getIdLeaf().getValue());
+      }
+    }
 
     //System.out.println(node.getIdLeaf().getValue());
     //TableStack.printTables();
