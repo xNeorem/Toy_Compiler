@@ -74,10 +74,10 @@ ProcList ::= Proc:p {: ArrayList<ProcNode> ps = new ArrayList<>();
 VarDecl ::= Type:t IdListInit:i SEMI {: RESULT = new VarDeclNode(t, i);  :}
 ;
 
-Type ::= INT {: RESULT = new TypeDeclNode("int");  :}
-        | BOOL {: RESULT = new TypeDeclNode("bool");  :}
-        | FLOAT {: RESULT = new TypeDeclNode("float");  :}
-        | STRING {: RESULT = new TypeDeclNode("string");  :}
+Type ::= INT {: RESULT = new TypeDeclNode(Node.INT_CONST);  :}
+        | BOOL {: RESULT = new TypeDeclNode(Node.BOOLEAN_CONST);  :}
+        | FLOAT {: RESULT = new TypeDeclNode(Node.FLOAT_CONST);  :}
+        | STRING {: RESULT = new TypeDeclNode(Node.STRING_CONST);  :}
 ;
 IdListInit ::= ID:id {: ArrayList<Object> ids = new ArrayList<>();
                         ids.add(new IdLeaf(id));

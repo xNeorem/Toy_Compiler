@@ -344,9 +344,8 @@ public class ClangVisitor implements Visitor{
     String code = "#include <stdio.h>\n";
     code += "#include <string.h>\n";
     code += "#include <stdlib.h>\n";
+    code += "#include <stdbool.h>\n";
     code += "#define null ((char *)0)\n";
-    code += "#define true 1\n";
-    code += "#define false 0\n";
 
     if(node.getVarDeclListNode() != null)
       code += (String) node.getVarDeclListNode().accept(this);
@@ -436,7 +435,7 @@ public class ClangVisitor implements Visitor{
   @Override
   public Object visit(TypeDeclNode node) throws Exception {
     if(node.getValue().equals("string"))
-      return "char ";
+      return "char *";
     return node.getValue() + " ";
   }
 

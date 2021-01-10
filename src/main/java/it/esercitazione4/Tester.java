@@ -28,6 +28,7 @@ public class Tester {
         clangVisitor.visit(result);
         String filePath = clangVisitor.saveC(args[0]);
         System.out.println("ClangVisitor done");
-        Runtime.getRuntime().exec("./Toy2C.sh " + filePath);
+        if (!System.getProperty("os.name").toLowerCase().contains("win"))
+            Runtime.getRuntime().exec("./Toy2C.sh " + filePath);
     }
 }

@@ -63,7 +63,7 @@ public class Node {
             INT_CONST = "int",
             FLOAT_CONST = "float",
             STRING_CONST = "string",
-            BOOLEAN_CONST = "boolean",
+            BOOLEAN_CONST = "bool",
             NULL_CONST = "null",
             TRUE_CONST = "true",
             FALSE_CONST = "false",
