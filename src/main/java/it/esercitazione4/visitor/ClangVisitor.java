@@ -474,10 +474,15 @@ public class ClangVisitor implements Visitor{
   @Override
   public Object visit(WhileStatNode node) throws Exception {
     String code = "";
+    String statListNode1 = "";
+
     if(node.getStatListNode1() != null)
-      code += (String) node.getStatListNode1().accept(this);
+      statListNode1 += (String) node.getStatListNode1().accept(this);
+
+    code += statListNode1;
     code += "while(" + (String) node.getExprNode().accept(this) + "){";
     code += (String) node.getStatListNode2().accept(this);
+    code += statListNode1;
     code += "}";
     return code;
   }
