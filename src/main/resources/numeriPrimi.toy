@@ -1,0 +1,22 @@
+proc primo(int x)bool:
+    bool primo := true;
+    int i := 2, j;
+    while i<x && primo do
+            j := x / i;
+            j := x - j * i;
+            if j = 0 then primo := false;
+            else i := i + 1;
+            fi;
+        od;
+    -> primo
+corp;
+
+proc main()void:
+    int x;
+    write("Inserire il numero da controllare: \n");
+    readln(x);
+    if primo(x) then write(x, " è un numero primo\n");
+    else write(x, " non è un numero primo\n");
+    fi;
+    ->
+corp;

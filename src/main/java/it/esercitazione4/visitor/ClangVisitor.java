@@ -40,6 +40,8 @@ public class ClangVisitor implements Visitor{
         if(returnsCall.size() > 1){
           temp_param = ClangVisitor.generateTempVariable();
           code += "void** "+ temp_param + "=";
+        } else {
+          code += idLeaves.get(i).accept(this) + " = ";
         }
         code += callProcNode.getIdLeaf().accept(this);
         code += "(";
@@ -353,7 +355,7 @@ public class ClangVisitor implements Visitor{
 
     code += (String) node.getProcListNode().accept(this);
 
-    code += "int main(){"
+    code += "int main(int argc, char *argv[]){"
         + "    main_func();"
         + "    return 0;"
         + "}";

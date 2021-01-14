@@ -4,7 +4,7 @@
 
 string nome := "Michele";
 
-proc multAddDiff ()int, int, int, string:
+proc multAddDiff ()int, int, int:
 	int primo, secondo, mul, add, diff;
 	string a := "ciao";
 	
@@ -13,7 +13,7 @@ proc multAddDiff ()int, int, int, string:
 	write("Inserire il secondo argomento:\n");
 	readln(secondo);
 	mul, add, diff := primo*secondo, primo + secondo, primo - secondo;
-	-> mul, add, diff, "ca"
+	-> mul, add, diff
 corp;
 
 
@@ -28,9 +28,8 @@ corp;
 
 proc main()void :
 	int a, b, c;
-	string msg;
-	a, b, c, msg := multAddDiff();
-	write ("Ciao ", nome,msg);
+	a, b, c := multAddDiff();
+	write ("Ciao ", nome);
 	writeNewLines(2);
 	write("I tuoi valori sono:\n", a, " per la moltiplicazione\n", b,
 		" per la somma, e \n", c, " per la differenza");

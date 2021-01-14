@@ -1,0 +1,23 @@
+proc radice(int x)int:
+    bool flag := true;
+    int z := 0, t := 0;
+
+    while flag do
+        t := z * z;
+        if t > x then
+            z := z - 1;
+            flag := false;
+        fi;
+        z := z + 1;
+    od;
+    -> z-1
+corp;
+
+proc main()void:
+    int x, z;
+    write("Inserisci il valore di cui calcolare la radice: \n");
+    readln(x);
+    z := radice(x);
+    write("radq(", x, ") = ", z, " \n");
+    ->
+corp;

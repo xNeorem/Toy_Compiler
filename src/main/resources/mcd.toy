@@ -1,0 +1,22 @@
+proc mcd(int x, y)int:
+    while x <> y do
+        if x > y then
+            x := x - y;
+        else
+            y := y - x;
+        fi;
+    od;
+    -> x
+corp;
+
+proc main()void:
+    int x, y, z;
+    write("Inserisci il primo valore: \n");
+    readln(x);
+    write("Inserisci il secondo valore: \n");
+    readln(y);
+    z := mcd(x,y);
+    write("Il massimo comune divisore di ", x, " e ", y, " è ", z, "!\n");
+    ->
+corp;
+
