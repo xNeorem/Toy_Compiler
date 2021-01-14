@@ -315,10 +315,18 @@ public class ClangVisitor implements Visitor{
       code += (String) node.getReturnExprsNode().accept(this);
 
     else if(returnsCall.size() > 1){
-      int i = 0;
-      for (ExprNode exprNode : node.getReturnExprsNode().getExprListNode().getExprListNode()){
-        code += temp_param+"["+i+"]"+" = &"+exprNode.accept(this)+";";
-        i++;
+      ArrayList<ExprNode> exprNodes = node.getReturnExprsNode().getExprListNode().getExprListNode();
+      for (int i = 0; i < returnsCall.size(); i++){
+        if(exprNodes.get(i).getName().equals(Node.ID))
+          code += temp_param+"["+i+"]"+" = &"+exprNodes.get(i).accept(this)+";";
+        else{
+          String new_temp = ClangVisitor.generateTempVariable();
+          String expr_code = (String) exprNodes.get(i).accept(this);
+
+          code += returnsCall.get(i)+" "+new_temp+" = "+expr_code+";";
+          code += temp_param+"["+i+"]"+" = &"+new_temp+";";
+        }
+
       }
       code += "return "+temp_param+";";
     }
@@ -428,7 +436,7 @@ public class ClangVisitor implements Visitor{
   @Override
   public Object visit(TypeDeclNode node) throws Exception {
     if(node.getValue().equals("string"))
-      return "char *";
+      return "char*";
     return node.getValue() + " ";
   }
 
