@@ -364,10 +364,14 @@ public class ClangVisitor implements Visitor{
               "      printf(\"Non sono stati forniti tutti gli argomenti necessari\\n\");" +
               "   }";
       for(int i=0; i < main.getTypeInput().size(); i++){
-        if(main.getTypeInput().get(i).equals("int")) {
-          code += "int t_"+i+"=atoi(argv["+(i+1)+"]);";
-        } else if(main.getTypeInput().get(i).equals("float")) {
-          code += "float t_"+i+"=atof(argv["+(i+1)+"]);";
+        if(main.getTypeInput().get(i).equals(Node.INT_CONST)) {
+          code += "int t_" + i + "=atoi(argv[" + (i + 1) + "]);";
+        } else if(main.getTypeInput().get(i).equals(Node.FLOAT_CONST)) {
+          code += "float t_" + i + "=atof(argv[" + (i + 1) + "]);";
+        } else if(main.getTypeInput().get(i).equals(Node.BOOLEAN_CONST)) {
+            code += "bool t_"+i+"=atoi(argv["+(i+1)+"]);";
+        } else {
+          code += "char *t_"+i+"=argv["+(i+1)+"];";
         }
         params += "t_"+i+", ";
       }
