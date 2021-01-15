@@ -2,6 +2,7 @@ package it.esercitazione4.visitor;
 
 import it.esercitazione4.exceptions.TypeMismatchException;
 import it.esercitazione4.nodes.*;
+import it.esercitazione4.symboltable.EntrySymbolTable;
 import it.esercitazione4.symboltable.TableStack;
 
 import java.io.FileWriter;
@@ -344,6 +345,7 @@ public class ClangVisitor implements Visitor{
   @Override
   public Object visit(ProgramNode node) throws Exception {
     TableStack.add(node.getSymbolTable());
+    String params = "";
     String code = "#include <stdio.h>\n";
     code += "#include <string.h>\n";
     code += "#include <stdlib.h>\n";
@@ -355,10 +357,23 @@ public class ClangVisitor implements Visitor{
 
     code += (String) node.getProcListNode().accept(this);
 
-    code += "int main(int argc, char *argv[]){"
-        + "    main_func();"
-        + "    return 0;"
-        + "}";
+    code += "int main(int argc, char *argv[]){";
+    EntrySymbolTable main = TableStack.lookUp("main");
+    if(main.getTypeInput().size() > 0) {
+      code += "if( argc != "+ (main.getTypeInput().size() + 1) + " ) {" +
+              "      printf(\"Non sono stati forniti tutti gli argomenti necessari\\n\");" +
+              "   }";
+      for(int i=0; i < main.getTypeInput().size(); i++){
+        if(main.getTypeInput().get(i).equals("int")) {
+          code += "int t_"+i+"=atoi(argv["+(i+1)+"]);";
+        } else if(main.getTypeInput().get(i).equals("float")) {
+          code += "float t_"+i+"=atof(argv["+(i+1)+"]);";
+        }
+        params += "t_"+i+", ";
+      }
+      params = params.substring(0, params.length()-2);
+    }
+    code +=  "main_func("+params+");return 0;}";
     clangCode = code;
     TableStack.pop();
     return null;
@@ -503,12 +518,40 @@ public class ClangVisitor implements Visitor{
     String types = "";
     String params = "";
     for(ExprNode exprNode : node.getExprListNode().getExprListNode()){
-      params += (String) exprNode.accept(this) + ", ";
-      types += ClangVisitor.ioConst.get(exprNode.getType());
+
+      String temp_param = null;
+      if(exprNode.getName().equals(Node.CALL_PROC_OP)){
+        CallProcNode callProcNode = (CallProcNode) exprNode.getValue1();
+        ArrayList<String> returnsCall = new ArrayList<String>(
+                Arrays.asList(callProcNode.getType().split(", ")));
+        if(returnsCall.size()>1) {
+          temp_param = ClangVisitor.generateTempVariable();
+          code += "void** "+ temp_param + "=";
+          code += callProcNode.getIdLeaf().accept(this);
+          code += "(";
+          if(callProcNode.getExprListNode() != null){
+            for(ExprNode exprNodeIntern: callProcNode.getExprListNode().getExprListNode())
+              code += exprNodeIntern.accept(this) + ",";
+            code = code.substring(0,code.length() - 1);
+          }
+          code+=");";
+
+          for(int i = 0; i < returnsCall.size(); i++){
+            String type = returnsCall.get(i);
+            if(type.equals("string"))
+              type = "char*";
+            params += "*("+type+"*)"+temp_param+"["+i+"],";
+            types += ClangVisitor.ioConst.get(type.equals("char*") ? "string" : type);
+          }
+        }
+      } else {
+        params += (String) exprNode.accept(this) + ", ";
+        types += ClangVisitor.ioConst.get(exprNode.getType());
+      }
     }
     params = params.substring(0, params.length()-2);
 
-    code = String.format("printf(\"%s\", %s);", types, params);
+    code += String.format("printf(\"%s\", %s);", types, params);
     return code;
   }
 
