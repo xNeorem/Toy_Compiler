@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import it.esercitazione4.nodes.*;
 import java_cup.runtime.*;
 
-parser code {::}
-
 nonterminal ExprNode Expr;
 nonterminal ExprListNode ExprList;
 nonterminal IdListNode IdList;

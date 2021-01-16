@@ -6,6 +6,7 @@ import java_cup.runtime.Symbol;
 %line
 %char
 %column
+%unicode
 
 %{
   StringBuffer string = new StringBuffer();
@@ -13,8 +14,6 @@ import java_cup.runtime.Symbol;
     throw new Error("Error at line "+(yyline+1)+", column "+(yycolumn+1)+" : "+message);
   }
 %}
-
-%unicode
 
 separator = [ \r\n\t\f]
 digit = [0-9]
