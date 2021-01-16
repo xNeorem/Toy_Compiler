@@ -44,7 +44,50 @@ Come sopra riportato, definire le precedenze ci ha permesso di risolvere una gra
 
 Innanzitutto abbiamo aggiunto un nuovo terminale `RETURN`, poi abbiamo modificato le produzioni `Proc, WhileStat` in modo che utilizzino il nuovo terminale `RETURN` ed abbiamo eliminato la produzione `Stat -> /* empty */`.
 ## Analisi semantica
+OP | ARG1 | ARG2 | RETURN 
+--- | --- | --- |--- 
+`ADD` | `INT` | `INT` | `INT` |
+`DIFF` | `INT` | `INT` | `INT` |
+`MUL` | `INT` | `INT` | `INT` |
+`DIV` | `INT` | `INT` | `INT` |
+`ADD` | `INT` | `FLOAT` | `FLOAT` |
+`DIFF` | `INT` | `FLOAT` | `FLOAT` |
+`MUL` | `INT` | `FLOAT` | `FLOAT` |
+`DIV` | `INT` | `FLOAT` | `FLOAT` |
+`ADD` | `FLOAT` | `FLOAT` | `FLOAT` |
+`DIFF` | `FLOAT` | `FLOAT` | `FLOAT` |
+`MUL` | `FLOAT` | `FLOAT` | `FLOAT` |
+`DIV` | `FLOAT` | `FLOAT` | `FLOAT` |
+`AND` | `BOOL` | `BOOL` | `BOOL` |
+`OR` | `BOOL` | `BOOL` | `BOOL` |
+`LT` | `BOOL` | `BOOL` | `BOOL` |
+`LE` | `BOOL` | `BOOL` | `BOOL` |
+`NE` | `BOOL` | `BOOL` | `BOOL` |
+`EQ` | `BOOL` | `BOOL` | `BOOL` |
+`GT` | `BOOL` | `BOOL` | `BOOL` |
+`GE` | `BOOL` | `BOOL` | `BOOL` |
+`LT` | `INTEGER` | `INTEGER` | `BOOL` |
+`LE` | `INTEGER` | `INTEGER` | `BOOL` |
+`NE` | `INTEGER` | `INTEGER` | `BOOL` |
+`EQ` | `INTEGER` | `INTEGER` | `BOOL` |
+`GT` | `INTEGER` | `INTEGER` | `BOOL` |
+`GE` | `INTEGER` | `INTEGER` | `BOOL` |
+`LT` | `INTEGER` | `FLOAT` | `BOOL` |
+`LE` | `INTEGER` | `FLOAT` | `BOOL` |
+`NE` | `INTEGER` | `FLOAT` | `BOOL` |
+`EQ` | `INTEGER` | `FLOAT` | `BOOL` |
+`GT` | `INTEGER` | `FLOAT` | `BOOL` |
+`GE` | `INTEGER` | `FLOAT` | `BOOL` |
+`LT` | `STRING` | `STRING` | `BOOL` |
+`LE` | `STRING` | `STRING` | `BOOL` |
+`NE` | `STRING` | `STRING` | `BOOL` |
+`EQ` | `STRING` | `STRING` | `BOOL` |
+`GT` | `STRING` | `STRING` | `BOOL` |
+`GE` | `STRING` | `STRING` | `BOOL` |
+
+
 ## Generazione codice Clang
+Una scelta implementativa signficatica è stata realativa al ritorno di funzione multipla della CallProc
 ## Compilazione ed esecuzione
 Abbiamo avuto la necessità di comportarci in modo diverso a causa delle due principali famiglie di sistemi operativi: Linux e Windows.
 ### Linux
