@@ -18,7 +18,21 @@ La struttura del progetto risultante da queste nostre scelte è la seguente (vie
 
 ## Analisi lessicale
 ## Analisi sintattica
-Per la generazione del parser c'è stata la neccesità di 
+Per la fase di analisi sintattica c'è stata, prima di tutto, la neccesità di definire come strutturare l'albero sintattico. Inizialmente abbiamo pensato di procedere con utilizzando una libreria di terze parti che si occupasse dell'albero e di tutte le informazioni necessarie, andnado a differenziare i nodi dell'albero semplicemente per nome. Questa strategia alla lunga non si è rivelata opportuna, per cui abbiamo poi deciso di utilizzare un approccio object-oriented: abbiamo definito una classe `Node` che viene poi estesa da tutti i possibili nodi che si possono trovare all'interno del nostro albero sintatico; ovviamente la strttura di ogni nodo è stata definita in base alla grammatica.
+
+All'interno del file `toy.cup` abbiamo quindi definito tutti i possibili terminali e non terminali con i relativi tipi ed abbiamo avuto la necessità di definire le diverse preceper rendere la grammatica non ambigua.
+
+Gran parte del lavoro è stato effettuato per la produzione `Expr`, è infatti questa produzione che, se non correttamente gestita, rende la grammatica ambigua a causa delle divere operazioni che si possono fare con due `Expr`, abbiamo quindi dato le precedenze nel seguente ordine;
+1. Operatore unario `UMINUS`
+2. Operazioni moltiplicazione `TIMES` e divisione `DIV`
+3. Operazioni di addizione `PLUS` e sottrazione `MINUS`
+4. Negazione `NOT`
+5. Operatori relazionali `GT, GE, NE, LT, LE, EQ`
+6. Operatori `AND, OR`
+
+Come sopra riportato, definire le precedenze ci ha permesso di risolvere una gran parte dei problemi, tuttavia abbiamo dovuto apportare piccole modifiche alla grammatica per risolvere dei conflitti che si verificano. 
+
+Innanzitutto abbiamo aggiunto un nuovo terminale `RETURN`, poi abbiamo modificato le produzioni `Proc, WhileStat` in modo che utilizzino il nuovo terminale `RETURN` ed abbiamo eliminato la produzione `Stat -> /* empty */`.
 ## Analisi semantica
 ## Generazione codice Clang
 ## Compilazione ed esecuzione
