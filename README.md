@@ -28,7 +28,7 @@ Sono stati creati degli stati per la gestione semplificata delle stringhe e dei 
 Infine è stato inserito un metodo che fornisce in caso di errore un messaggio più significativo per il programmatore, fornendo anche gli indici (riga, colonna) dell'errore lessicale.
 
 ## Analisi sintattica
-Per la fase di analisi sintattica c'è stata, prima di tutto, la neccesità di definire come strutturare l'albero sintattico. Inizialmente abbiamo pensato di procedere con utilizzando una libreria di terze parti che si occupasse dell'albero e di tutte le informazioni necessarie, andnado a differenziare i nodi dell'albero semplicemente per nome. Questa strategia alla lunga non si è rivelata opportuna, per cui abbiamo poi deciso di utilizzare un approccio object-oriented: abbiamo definito una classe `Node` che viene poi estesa da tutti i possibili nodi che si possono trovare all'interno del nostro albero sintatico; ovviamente la strttura di ogni nodo è stata definita in base alla grammatica.
+Per la fase di analisi sintattica c'è stata, prima di tutto, la neccesità di definire come strutturare l'albero sintattico. Inizialmente abbiamo pensato di procedere con utilizzando una libreria di terze parti che si occupasse dell'albero e di tutte le informazioni necessarie, andando a differenziare i nodi dell'albero semplicemente per nome. Questa strategia alla lunga non si è rivelata opportuna, per cui abbiamo poi deciso di utilizzare un approccio object-oriented: abbiamo definito una classe `Node` che viene poi estesa da tutti i possibili nodi che si possono trovare all'interno del nostro albero sintatico; ovviamente la strttura di ogni nodo è stata definita in base alla grammatica.
 
 All'interno del file `toy.cup` abbiamo quindi definito tutti i possibili terminali e non terminali con i relativi tipi ed abbiamo avuto la necessità di definire le diverse preceper rendere la grammatica non ambigua.
 
@@ -46,6 +46,14 @@ Innanzitutto abbiamo aggiunto un nuovo terminale `RETURN`, poi abbiamo modificat
 
 A questo punto JavaCup riesce ad utilizzare il file`toy.cup` per generare automaticamente un parser `LALR(1)`.
 ## Analisi semantica
+In questa fase sono state implementate tutte le regole d'inferenza e il `Type System` del linguaggio Toy.
+
+E' stata effettuata una verifica per ogni tipo di nodo, evidenziando al programmatore attraverso delle opportune `Exception` nel caso di un errore semantico.
+
+Di seguito é riportata la tabella che evidenzia i vari tipi cui possono essere impiegati gli operatori.
+
+parlare dello stack.
+
 OP | ARG1 | ARG2 | RETURN 
 --- | --- | --- |--- 
 `ADD` | `INT` | `INT` | `INT` |
