@@ -90,6 +90,30 @@ OP | ARG1 | ARG2 | RETURN
 
 ## Generazione codice Clang
 Una scelta implementativa signficatica è stata realativa al ritorno di funzione multipla della CallProc
+
+OP | STRING
+--- | --- 
+`ADD` | `+`
+`DIFF` | `-`
+`MUL` | `*`
+`DIV` | `/`
+`AND` | `&&`
+`OR` | &#124;&#124;
+`LT` | `<`
+`LE` | `<=`
+`NE` | `!=`
+`EQ` | `==`
+`GT` | `>` 
+`GE` | `>=`
+
+IOCONST | STRING
+--- | --- 
+`STRING` | `%d`
+`FLOAT` | `%f`
+`STRING` | `%s`
+`BOOL` | `%d`
+
+
 ## Compilazione ed esecuzione
 Abbiamo avuto la necessità di comportarci in modo diverso a causa delle due principali famiglie di sistemi operativi: Linux e Windows.
 ### Linux
