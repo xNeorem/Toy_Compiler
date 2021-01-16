@@ -39,7 +39,7 @@ proc main()void :
 
         write("Risultato: ",calc(scelta,a,b),"\n");
 
-        write("Digita 1 per continuare\n Scelta: ");
+        write("Digita 1 per continuare\nScelta: ");
         readln(scelta);
 
     od;

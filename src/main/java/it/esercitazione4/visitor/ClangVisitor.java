@@ -364,16 +364,17 @@ public class ClangVisitor implements Visitor{
               "      printf(\"Non sono stati forniti tutti gli argomenti necessari\\n\");" +
               "   }";
       for(int i=0; i < main.getTypeInput().size(); i++){
+        String temp = ClangVisitor.generateTempVariable();
         if(main.getTypeInput().get(i).equals(Node.INT_CONST)) {
-          code += "int t_" + i + "=atoi(argv[" + (i + 1) + "]);";
+          code += "int "+ temp +"=atoi(argv[" + (i + 1) + "]);";
         } else if(main.getTypeInput().get(i).equals(Node.FLOAT_CONST)) {
-          code += "float t_" + i + "=atof(argv[" + (i + 1) + "]);";
+          code += "float "+temp+"=atof(argv[" + (i + 1) + "]);";
         } else if(main.getTypeInput().get(i).equals(Node.BOOLEAN_CONST)) {
-            code += "bool t_"+i+"=atoi(argv["+(i+1)+"]);";
+            code += "bool "+temp+"=atoi(argv["+(i+1)+"]);";
         } else {
-          code += "char *t_"+i+"=argv["+(i+1)+"];";
+          code += "char *"+temp+"=argv["+(i+1)+"];";
         }
-        params += "t_"+i+", ";
+        params += temp+", ";
       }
       params = params.substring(0, params.length()-2);
     }
@@ -431,7 +432,11 @@ public class ClangVisitor implements Visitor{
         code += (String) ((AssignStatNode) statNode).accept(this);
       }
       if(statNode instanceof CallProcNode){
-        code += (String) ((CallProcNode) statNode).accept(this) + ";";
+        String callProc = (String) ((CallProcNode)statNode).accept(this);
+        if(Arrays.asList(((CallProcNode) statNode).getType().split(", ")).size() > 1)
+          code += "free("+callProc+");";
+        else
+          code += callProc + ";";
       }
       if(statNode instanceof IfStatNode){
         code += (String) ((IfStatNode) statNode).accept(this);
@@ -521,32 +526,29 @@ public class ClangVisitor implements Visitor{
     String code = "";
     String types = "";
     String params = "";
+    String temp_param = null;
     for(ExprNode exprNode : node.getExprListNode().getExprListNode()){
-
-      String temp_param = null;
-      if(exprNode.getName().equals(Node.CALL_PROC_OP)){
+      if(exprNode.getName().equals(Node.CALL_PROC_OP) && Arrays.asList(((CallProcNode) exprNode.getValue1()).getType().split(", ")).size() > 1){
         CallProcNode callProcNode = (CallProcNode) exprNode.getValue1();
         ArrayList<String> returnsCall = new ArrayList<String>(
                 Arrays.asList(callProcNode.getType().split(", ")));
-        if(returnsCall.size()>1) {
-          temp_param = ClangVisitor.generateTempVariable();
-          code += "void** "+ temp_param + "=";
-          code += callProcNode.getIdLeaf().accept(this);
-          code += "(";
-          if(callProcNode.getExprListNode() != null){
-            for(ExprNode exprNodeIntern: callProcNode.getExprListNode().getExprListNode())
-              code += exprNodeIntern.accept(this) + ",";
-            code = code.substring(0,code.length() - 1);
-          }
-          code+=");";
+        temp_param = ClangVisitor.generateTempVariable();
+        code += "void** "+ temp_param + "=";
+        code += callProcNode.getIdLeaf().accept(this);
+        code += "(";
+        if(callProcNode.getExprListNode() != null){
+          for(ExprNode exprNodeIntern: callProcNode.getExprListNode().getExprListNode())
+            code += exprNodeIntern.accept(this) + ",";
+          code = code.substring(0,code.length() - 1);
+        }
+        code+=");";
 
-          for(int i = 0; i < returnsCall.size(); i++){
-            String type = returnsCall.get(i);
-            if(type.equals("string"))
-              type = "char*";
-            params += "*("+type+"*)"+temp_param+"["+i+"],";
-            types += ClangVisitor.ioConst.get(type.equals("char*") ? "string" : type);
-          }
+        for(int i = 0; i < returnsCall.size(); i++){
+          String type = returnsCall.get(i);
+          if(type.equals("string"))
+            type = "char*";
+          params += "*("+type+"*)"+temp_param+"["+i+"],";
+          types += ClangVisitor.ioConst.get(type.equals("char*") ? "string" : type);
         }
       } else {
         params += (String) exprNode.accept(this) + ", ";
@@ -556,6 +558,7 @@ public class ClangVisitor implements Visitor{
     params = params.substring(0, params.length()-2);
 
     code += String.format("printf(\"%s\", %s);", types, params);
+    if(temp_param != null) code += "free("+temp_param+");";
     return code;
   }
 
