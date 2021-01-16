@@ -89,6 +89,7 @@ OP | ARG1 | ARG2 | RETURN
 
 
 ## Generazione codice Clang
+
 Una scelta implementativa signficativa è stata per la gestione dei multipli valori di ritorno di una funzione.
 
 Dato che in `C` non è possibile effettuare questo tipo di operazione, quando viene verificato che una funzione ritorna più di un valore, in `C` viene generata una funzione che ritorna un array di puntatori a void.
@@ -125,6 +126,10 @@ I puntatori a `void` possono puntate qualsisi tipo di dato, questa loro propriet
 
 Per non avere nessun tipo di overhead nel codice tradotto questa struttura da noi creata viene **deallocata**.
 
+Abbiamo avuto la necessità di mappare gli operatori di Toy con quelli di C in modo da facilitarci nella traduzione.
+
+La tabella sottostante mostra la corrispondeza degli operatori tra i due linguaggi.
+
 OP | STRING
 --- | --- 
 `ADD` | `+`
@@ -139,6 +144,10 @@ OP | STRING
 `EQ` | `==`
 `GT` | `>` 
 `GE` | `>=`
+
+La stessa tecnica è stata impiegata anche per facilitarci nella traduzione nel comando `write` in una `printf` di `C`.
+Essendo che la funzione `printf` utilizza dei caratteri speciali per la stampa. 
+Abbiamo mappato per ogni tipo di operatore il suo carattere speciale. 
 
 IOCONST | STRING
 --- | --- 
