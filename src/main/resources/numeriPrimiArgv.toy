@@ -13,7 +13,7 @@ corp;
 
 proc test(bool y; string nome)int,int,int:
     int a:=1,b:=2,c:=3;
-    if y then write(nome);
+    if y && nome="MICHELE" then write(nome);
     fi;
     -> a, b, c
 corp;

@@ -361,7 +361,7 @@ public class ClangVisitor implements Visitor{
     EntrySymbolTable main = TableStack.lookUp("main");
     if(main.getTypeInput().size() > 0) {
       code += "if( argc != "+ (main.getTypeInput().size() + 1) + " ) {" +
-              "      printf(\"Non sono stati forniti tutti gli argomenti necessari\\n\");" +
+              "      printf(\"Non sono stati forniti tutti gli argomenti necessari\\n\");return 0;" +
               "   }";
       for(int i=0; i < main.getTypeInput().size(); i++){
         String temp = ClangVisitor.generateTempVariable();
