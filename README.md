@@ -17,6 +17,16 @@ La struttura del progetto risultante da queste nostre scelte è la seguente (vie
     - toy.flex
 
 ## Analisi lessicale
+Per la generazione del lexer è stato utilizzato un tool di creazione automatica di lexer, ovvero JFlex.
+
+Data una specifica ber definita JFlex è in grado di generare un lexer in codice Java.
+
+Il file `toy.flex` contiene la specifica fornita ad JFlex per la creazione del nostro lexer che è in grado di riconsocere tutte i token definiti nella specifica del linguaggio.
+
+Sono stati creati dei stati per la gestione semplificata delle stringhe e dei commenti.
+
+Infine è stato inserito un metodo che fornisce in caso di errore un messaggio più significativo per il programmatore, fornendo anche gli indici (riga, colonna) del errore lessicale.
+
 ## Analisi sintattica
 Per la generazione del parser c'è stata la neccesità di 
 ## Analisi semantica
