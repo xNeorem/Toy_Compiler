@@ -18,12 +18,20 @@ La struttura del progetto risultante da queste nostre scelte è la seguente (vie
 
 ## Analisi lessicale
 ## Analisi sintattica
+Per la generazione del parser c'è stata la neccesità di 
 ## Analisi semantica
 ## Generazione codice Clang
 ## Compilazione ed esecuzione
 Abbiamo avuto la necessità di comportarci in modo diverso a causa delle due principali famiglie di sistemi operativi: Linux e Windows.
 ### Linux
+Per rendere più agevole l'esecuzione è stato inserito all'interno del file `Tester.java` il seguente blocco codice:
+```java
+if (!System.getProperty("os.name").toLowerCase().contains("win"))
+            Runtime.getRuntime().exec("./Toy2C.sh " + filePath);
+```
+Quindi nel caso in cui ci si trovi in un sistema Linux si esegue all'interno della shell lo script `Toy2C.sh` inviando come argomento il percorso del file C da compilare.
 
+Lo script `Toy2C.sh` non si limita semplicemente alla compilazione del file C ma si occupa anche di formattarlo in modo da renderlo leggibile (viene utilizzato il tool `clang-format`), compilarlo ed eseguirlo all'interno del terminale esterno (in modo da poterci interagire e visualizzare i risultati).
 ### Windows 
 
 
