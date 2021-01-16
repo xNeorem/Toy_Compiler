@@ -23,6 +23,7 @@ La struttura del progetto risultante da queste nostre scelte è la seguente (vie
 ## Compilazione ed esecuzione
 Abbiamo avuto la necessità di comportarci in modo diverso a causa delle due principali famiglie di sistemi operativi: Linux e Windows.
 ### Linux
+
 ### Windows 
 
 

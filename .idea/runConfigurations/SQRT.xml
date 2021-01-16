@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SQRT" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="it.esercitazione4.Tester" />
+    <module name="Fasano-Gullo_es5_scg" />
+    <option name="PROGRAM_PARAMETERS" value="src/main/resources/sqrt.toy" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="it.esercitazione4.symboltable.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
