@@ -12,9 +12,10 @@ proc primo(int x)bool:
 corp;
 
 proc test(bool y; string nome)int,int,int:
+    int a:=1,b:=2,c:=3;
     if y then write(nome);
     fi;
-    -> 1, 2, 3
+    -> a, b, c
 corp;
 
 proc main(int x; bool y)void:

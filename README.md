@@ -89,7 +89,41 @@ OP | ARG1 | ARG2 | RETURN
 
 
 ## Generazione codice Clang
-Una scelta implementativa signficatica è stata realativa al ritorno di funzione multipla della CallProc
+Una scelta implementativa signficativa è stata per la gestione dei multipli valori di ritorno di una funzione.
+
+Dato che in `C` non è possibile effettuare questo tipo di operazione, quando viene verificato che una funzione ritorna più di un valore, in `C` viene generata una funzione che ritorna un array di puntatori a void.
+
+Ad esempio dal seguente codice toy:
+
+    proc test(bool y; string nome)int,int,int:
+        int a:=1,b:=2,c:=3;
+            if y then write(nome);
+            fi;
+        -> a, b, c
+    corp;
+Verrà generato il seguente codice `C`:
+
+```C
+void ** test(bool y, char * nome) {
+  int a = 1, b = 2, c = 3;
+  void ** t_0 = (void ** ) malloc(sizeof(void * ) * 3);
+  if (t_0 == NULL) {
+    printf("Memory not allocated for return values.");
+    exit(0);
+  }
+  if (y) {
+    printf("%s", nome);
+  }
+  t_0[0] = &a;
+  t_0[1] = &b;
+  t_0[2] = &c;
+  return t_0;
+}
+```
+
+I puntatori a `void` possono puntate qualsisi tipo di dato, questa loro proprietà ci permette attraverso dei opportuni cast di gestire i vari tipi dei valori di ritorno.
+
+Per non avere nessun tipo di overhead nel codice tradotto questa struttura da noi creata viene **deallocata**.
 
 OP | STRING
 --- | --- 
