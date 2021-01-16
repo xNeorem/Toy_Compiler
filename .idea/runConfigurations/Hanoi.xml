@@ -1,7 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Hanoi" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="11" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="it.esercitazione4.Tester" />
-    <module name="Fasano-Gullo_es5_scg" />
+    <module name="Fasano-Gullo_es4_tlp" />
     <option name="PROGRAM_PARAMETERS" value="src/main/resources/Hanoi.toy" />
     <extension name="coverage">
       <pattern>

@@ -17,6 +17,16 @@ La struttura del progetto risultante da queste nostre scelte è la seguente (vie
     - toy.flex
 
 ## Analisi lessicale
+Per la generazione del lexer è stato utilizzato un tool di creazione automatica di lexer, ovvero JFlex.
+
+Data una specifica ber definita JFlex è in grado di generare un lexer in codice Java.
+
+Il file `toy.flex` contiene la specifica fornita ad JFlex per la creazione del nostro lexer che è in grado di riconsocere tutte i token definiti nella specifica del linguaggio.
+
+Sono stati creati dei stati per la gestione semplificata delle stringhe e dei commenti.
+
+Infine è stato inserito un metodo che fornisce in caso di errore un messaggio più significativo per il programmatore, fornendo anche gli indici (riga, colonna) del errore lessicale.
+
 ## Analisi sintattica
 Per la fase di analisi sintattica c'è stata, prima di tutto, la neccesità di definire come strutturare l'albero sintattico. Inizialmente abbiamo pensato di procedere con utilizzando una libreria di terze parti che si occupasse dell'albero e di tutte le informazioni necessarie, andnado a differenziare i nodi dell'albero semplicemente per nome. Questa strategia alla lunga non si è rivelata opportuna, per cui abbiamo poi deciso di utilizzare un approccio object-oriented: abbiamo definito una classe `Node` che viene poi estesa da tutti i possibili nodi che si possono trovare all'interno del nostro albero sintatico; ovviamente la strttura di ogni nodo è stata definita in base alla grammatica.
 
@@ -46,7 +56,7 @@ if (!System.getProperty("os.name").toLowerCase().contains("win"))
 Quindi nel caso in cui ci si trovi in un sistema Linux si esegue all'interno della shell lo script `Toy2C.sh` inviando come argomento il percorso del file C da compilare.
 
 Lo script `Toy2C.sh` non si limita semplicemente alla compilazione del file C ma si occupa anche di formattarlo in modo da renderlo leggibile (viene utilizzato il tool `clang-format`), compilarlo ed eseguirlo all'interno del terminale esterno (in modo da poterci interagire e visualizzare i risultati).
-### Windows 
+### Windows
+Nel caso in cui ci si trovi in un sistema Windows si esegue all'interno della shell lo script `Toy2C.bat` inviando come argomento il percorso del file C da compilare.
 
-
-    
+Anche lo script `Toy2C.bat` offre le stesse funzionalità di `Toy2C.sh`, l'unica differenza tra i due script é che lo scirpt per windows deve essere eseguito manualmente da un terminare aperto dall'utente.
