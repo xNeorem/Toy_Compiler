@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="NumeriPrimiArgv" type="Application" factoryName="Application">
+  <configuration default="false" name="functionReturn" type="Application" factoryName="Application">
     <option name="ALTERNATIVE_JRE_PATH" value="11.0.4" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="it.esercitazione4.Tester" />
     <module name="Fasano-Gullo_es5_scg" />
-    <option name="PROGRAM_PARAMETERS" value="src/main/resources/numeriPrimiArgv.toy" />
+    <option name="PROGRAM_PARAMETERS" value="src/main/resources/functionReturn.toy" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="it.esercitazione4.symboltable.*" />

@@ -367,10 +367,21 @@ public class SemanticVisitor implements Visitor{
       node.getReturnExprsNode().accept(this);
       ArrayList<ExprNode> exprNodes = node.getReturnExprsNode().getExprListNode().getExprListNode();
 
-      if(exprNodes.size() != returns.size())
-        throw new ReturnParamsException(node.getIdLeaf().getValue());
+      /*if(exprNodes.size() != returns.size())
+        throw new ReturnParamsException(node.getIdLeaf().getValue());*/
       for (int j = 0; j < exprNodes.size(); j++){
-        if(!returns.get(j).equals(exprNodes.get(j).getType()))
+        ExprNode expr = exprNodes.get(j);
+        if(expr.getName().equals(Node.CALL_PROC_OP)){
+          CallProcNode callProcNode = (CallProcNode) exprNodes.get(j).getValue1();
+          ArrayList<String> returnsCall = new ArrayList<String>(
+              Arrays.asList(callProcNode.getType().split(", ")));
+          for(String returnCall : returnsCall){
+            if(!returnCall.equals(returns.get(j)))
+              throw new ReturnParamsException(node.getIdLeaf().getValue());
+            j++;
+          }
+        }
+        else if(!returns.get(j).equals(expr.getType()))
           throw new ReturnParamsException(node.getIdLeaf().getValue());
       }
     }

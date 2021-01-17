@@ -1,0 +1,12 @@
+proc proc2()int:
+    -> 5 + 3
+corp;
+
+proc proc1()int:
+    -> proc2()
+corp;
+
+proc main()void:
+    write("Il numero ottenuto è: ", proc1(), "!\n");
+    ->
+corp;

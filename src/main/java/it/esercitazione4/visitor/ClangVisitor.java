@@ -320,7 +320,30 @@ public class ClangVisitor implements Visitor{
     else if(returnsCall.size() > 1){
       ArrayList<ExprNode> exprNodes = node.getReturnExprsNode().getExprListNode().getExprListNode();
       for (int i = 0; i < returnsCall.size(); i++){
-        if(exprNodes.get(i).getName().equals(Node.ID))
+        if(exprNodes.get(i).getName().equals(Node.CALL_PROC_OP) &&
+            Arrays.asList(((CallProcNode) exprNodes.get(i).getValue1()).getType().split(", ")).size() > 1){
+
+          CallProcNode callProcNode = (CallProcNode) exprNodes.get(i).getValue1();
+          ArrayList<String> callProcReturns = new ArrayList<String>(
+              Arrays.asList(callProcNode.getType().split(", ")));
+
+          String tempCallProc = ClangVisitor.generateTempVariable();
+          code += "void** "+tempCallProc + " = "+callProcNode.accept(this)+";";
+
+          for(int j = 0; j <callProcReturns.size(); j++){
+            String tempVar = ClangVisitor.generateTempVariable();
+            String type = callProcReturns.get(j);
+            if(type.equals("string"))
+              type = "char*";
+
+            code += type+" "+tempVar + " = "+ "*("+type+"*)"+tempCallProc+"["+j+"];";
+            code += temp_param+"["+i+"]"+" = "+"&"+tempVar+";";
+            i++;
+          }
+
+          code += "free("+tempCallProc+");";
+        }
+        else if(exprNodes.get(i).getName().equals(Node.ID))
           code += temp_param+"["+i+"]"+" = &"+exprNodes.get(i).accept(this)+";";
         else{
           String new_temp = ClangVisitor.generateTempVariable();

@@ -19,30 +19,22 @@ corp;
 proc main()void :
 	float a := 0.0, b := 0.0;
 
-	int scelta := 1;
+	int scelta;
 
-	while scelta = 1 do
-
-        write("MENU\nSeleziona un'operazione:\n");
+	while
+	    write("MENU\nSeleziona un'operazione (un numero non presente farà terminare l'esecuzione):\n");
         write("1) Somma\n");
         write("2) Sottrazione\n");
         write("3) Motiplicazione\n");
         write("4) Divisione\n");
         write("\nScelta:");
         readln(scelta);
-
-
+	-> scelta > 0 && scelta < 5 do
         write("Inserire il primo argomento:\n");
         readln(a);
         write("Inserire il secondo argomento:\n");
         readln(b);
-
         write("Risultato: ",calc(scelta,a,b),"\n");
-
-        write("Digita 1 per continuare\nScelta: ");
-        readln(scelta);
-
     od;
-
 	->
 corp;
