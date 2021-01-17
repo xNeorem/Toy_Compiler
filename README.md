@@ -57,18 +57,26 @@ Innanzitutto abbiamo aggiunto un nuovo terminale `RETURN`, poi abbiamo modificat
 A questo punto JavaCup riesce ad utilizzare il file `toy.cup` per generare automaticamente un parser `LALR(1)`.
 
 ## Analisi semantica
-In questa fase sono state implementate tutte le regole d'inferenza e il `Type System` del linguaggio Toy.
+In questa fase è stato creato un `SemanticVisitor.class` in grado di effettuare il Type Check, ovvero assegnare un tipo a tutti i simboli del linguaggio, in modo da poter poi effettuare eventuali controlli di tipo all'interno delle espressioni.
 
-E' stata effettuata una verifica per ogni tipo di nodo, evidenziando al programmatore l'errore semantico attraverso delle opportune `Exception`.
+Sono state inoltre implementate tutte le regole di inferenza richieste all'interno della specifica del linguaggio.
 
-La gestione dello scoping è stato gestito attraverso una struttura stack modellata dalla classe `TableStack`.
-Espone l'interfacce per l'aggiunta ed eliminazione di una tabella all'interno dello stack. 
+Eventuali errori di tipo semantico vengono evidenziati al programmatore mediante l'utilizzo di opportune Exception che sono state create:
+- `UndeclaredException`: lanciata quando si incontra l'utilizzo di una variabile o di una funzione che non è stata dichiarata
+- `AlreadyDeclaredException`: lanciata quando un simbolo è già stato definito all'interno dello scope e si prova a riutilizzarlo in una nuova definizione
+- `TypeMismatchException`: lanciata ogni qual volta si riscontrino problemi di tipo all'interno delle operazioni
+- `ReturnParamsException`: lanciata quando i valori di ritorno di una funzione non rispettano la firma della funzione stessa
+- `CallProcException`: lanciata quando una funzione non viene invocata correttamente
 
-Ovviamente, la classe fornisce anche una interfaccia che permette di effettuare una `lookUp` all'interno delle tabelle presenti nello stack.
+È stata creata una classe statica per effettuare una corretta gestione dello scoping, tale classe è stata chiamta `TableStack.java` ed è stata costruita in modo da semplificare al massimo il lavoro all'interno del SemanticVisitor:
+- Contiene una Stack di SymbolTable
+- Espone la funzione `EntrySymbolTable lookup(String symbol)` che ricerca un determinato simbolo all'interno dello scope corrente ed in quello dei genitori
+- Espone la funzione `SymbolTable getHead()` che restituisce la SymbolTable in testa allo Stack
+- Ulteriori funzionalità per la normale gestione di una Stack, come: add, pop e size
 
-Ogni tabella di scooping é formata nel seguente modo.
+Presentiamo la struttura di una entry della nostra SymbolTable:
 
-ID | SYBOL | TYPE | TYPEINPUT | TYPEINPUT | KIND
+ID | SYMBOL | TYPE | TYPEIN | TYPEOUT | KIND
 --- | --- | --- |--- | --- |---
 `String` | `String` | `String` |`ArrayList<String>` | `ArrayList<String>` | `var`&#124;&#124;`proc`
 
@@ -78,7 +86,9 @@ Per le procedure viene conservato l'id, il simbolo, la lista dei tipi dei parame
 
 Nel caso delle variabili viene conservato l'id, il simbolo e il tipo a lei associata.
 
-Di seguito é riportata la tabella che evidenzia i vari tipi cui possono essere impiegati gli operatori.
+Riportiamo di seguito il Type System, ovvero la tabella che specifica come assegnare un tipo ad una espressione data una operazione ed i tipi degli argomenti.
+
+Dal punto di vista pratico questa tabella è stata implementata come una `HashTable<KeyOpTypes, String> opTypes2` dove l'oggetto KeyOp non è altro che una tripla costituita dall'operazione, tipo del primo argomento e tipo del secondo argomento; ciò significa che semplicemente utilizzando il metodo `get(KeyOpTypes tripla)` fornito di default per il tipo HashMap otteniamo il tipo della espressione ricercata.
 
 OP | ARG1 | ARG2 | RETURN 
 --- | --- | --- |--- 
@@ -121,27 +131,62 @@ OP | ARG1 | ARG2 | RETURN
 `GT` | `STRING` | `STRING` | `BOOL` |
 `GE` | `STRING` | `STRING` | `BOOL` |
 
-
+Una scelta che abbiamo deciso di portare avanti in questa fase è stata quella di effettuare tutti i controlli necessari per supportare la funziona di unpacking di Toy:
+```
+mul, add, diff := mulAddDiff()
+```
+ed inoltre permettere che non tutti i valori di ritorno della funzione vengano effettivamente assegnati ad una variabile, in tal modo se si è interessati solo ai primi due valori basterà utilizzare solo due variabili.
 ## Generazione codice Clang
+Nella conversione del codice Toy in codice C abbiamo effettuato varie scelte progettuali in risposta a problemi specifici:
+1. come viene effettuata la conversione da main di Toy a main di C
+2. rappresentazione dei tipi booleani
+3. rappresentazione delle stringhe
+4. conversione delle funzioni che hanno valori di ritorno multipli
 
-Una scelta implementativa signficativa è stata per la gestione dei multipli valori di ritorno di una funzione.
+Per evitare qualsiasi sorta di problema abbiamo deciso di creare, all'interno del codice C, una funzione main che rispetti quelle che sono le specifiche del C e che invochi la funzione main del programma scritto in linguaggio Toy, riportiamo un esempio pratico.
+```
+proc main()void:
+    write("Test");
+    ->
+corp;
+```
+```C
+void main_func() {
+    printf("Test");
+}
 
-Dato che in C non è possibile effettuare questo tipo di operazione, quando viene verificato che una funzione ritorna più di un valore, in C viene generata una funzione che ritorna un array di puntatori a void.
+int main(int argc, char *argv[]){
+    main_func();
+    return 0;
+}
+```
+In questo modo non c'è bisogno di preoccuparsi di quale sia il tipo di ritorno della funzione main specificata in Toy.
 
-Ad esempio dal seguente codice toy:
+Una ulteriore possibilità implementata è la capacità di inserire parametri alla funzione main di Toy e tradurre tutto ciò facendo in modo che tali variabili siano attesi in C dalla riga di comando, ovvero presi dall'array argv (con tutte le conversioni del caso).
 
-    proc test(bool y; string nome)int,int,int:
-        int a:=1,b:=2,c:=3;
-            if y then write(nome);
-            fi;
-        -> a, b, c
-    corp;
+I booleani invece sono stati gestiti semplicemente inserendo all'interno del codice C la libreria `stdbool.h`.
+
+In modo simile è stata effettuata la gestione delle stringhe, come sappiamo C non supporta un tipo stringa ma implementa questo concetto con un array di char, per cui le stringhe sono state dichiarate come `char*` e le operazioni tra stringhe sono state garantite tramite l'utilizzo della libreria `string.h`.
+
+La scelta che ha maggiormente impattato sulla fase di conversione del codice è stata quella di gestire tutte le funzioni con valori di ritorno multipli con dei puntatori.
+
+Dato che in C non è possibile che una funzione abbia valori di ritorno multipli, quando ci si trova in una situazione del genere, in C viene generata una funzione che ritorna un array di puntatori a void.
+
+Ad esempio dal seguente codice Toy:
+```
+proc test(bool y; string nome)int,int,int:
+    int a:=1,b:=2,c:=3;
+        if y then write(nome);
+        fi;
+    -> a, b, c
+corp;
+```
 Verrà generato il seguente codice C:
 
 ```C
-void ** test(bool y, char * nome) {
+void **test(bool y, char *nome) {
   int a = 1, b = 2, c = 3;
-  void ** t_0 = (void ** ) malloc(sizeof(void * ) * 3);
+  void **t_0 = (void **) malloc(sizeof(void*) * 3);
   if (t_0 == NULL) {
     printf("Memory not allocated for return values.");
     exit(0);
@@ -156,9 +201,17 @@ void ** test(bool y, char * nome) {
 }
 ```
 
-I puntatori a `void` possono puntate qualsisi tipo di dato, questa loro proprietà ci permette attraverso dei opportuni cast di gestire i vari tipi dei valori di ritorno.
+I puntatori a void possono puntare qualsiasi tipo di dato, questa loro proprietà ci permette attraverso degli opportuni cast di gestire i vari tipi dei valori di ritorno.
 
-Per non avere nessun tipo di overhead nel codice tradotto questa struttura da noi creata viene **deallocata**.
+Per rendere questa nostra scelta funzionale anche dal punto di vista della gestione della memoria, ci siamo assicurati dove necessario, di andare a deallocare correttamente la struttura dati.
+
+Abbiamo permesso la prossibilità, inserendo una chiamata a funzione in una write, anche di stampare tutti i valori che la funzione ritorna.
+
+Tra l'altro dato che Toy permette una sorta di meccanismo di unpacking del tipo:
+```
+mul, add, diff := mulAddDiff()
+```
+abbiamo supportato questo comportamento mediante la creazione di variabili temporanee.
 
 Abbiamo avuto la necessità di mappare gli operatori di Toy con quelli di C in modo da facilitarci nella traduzione.
 
@@ -181,7 +234,7 @@ OP | STRING
 
 La stessa tecnica è stata impiegata anche per facilitarci nella traduzione nel comando `write` in una `printf` di C.
 Essendo che la funzione `printf` utilizza dei caratteri speciali per la stampa. 
-Abbiamo mappato per ogni tipo di operatore il suo carattere speciale. 
+Abbiamo mappato per ogni tipo di variabile il carattere speciale per rappresentarla all'interno di una stringa. 
 
 IOCONST | STRING
 --- | --- 
