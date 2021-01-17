@@ -1,5 +1,5 @@
 # Progetto compilatori linguaggio Toy completo
-_Il progetto è stato eseguito dagli studenti Fasano Salvatore e Gullo Gerardo nell'ambito del corso di Compilatori, Università degli Studi di Salerno, AA 202/2021._
+_Il progetto è stato eseguito dagli studenti Fasano Salvatore e Gullo Gerardo nell'ambito del corso di Compilatori, Università degli Studi di Salerno, AA 2020/2021._
 
 ## Maven
 Data la natura del progetto, bisogna utilizzare i tool esterni JFlex e JavaCup per poter rispettivamente generare il lexer ed il parser. A tal proposito per rendere l'utilizzo di tali tool più confortevole ed agevolare gli utenti che collaborano al progetto abbiamo preferito utilizzare un package manager, in particolare Maven. Di fatto Maven ci permette di specificare le librerie da utilizzare ed in un IDE, nel momento dell'apertura del progetto, già si hanno tutte le librerie pronte per l'utilizzo ed in una versione sicuramente funzionante.
@@ -59,11 +59,26 @@ A questo punto JavaCup riesce ad utilizzare il file `toy.cup` per generare autom
 ## Analisi semantica
 In questa fase sono state implementate tutte le regole d'inferenza e il `Type System` del linguaggio Toy.
 
-E' stata effettuata una verifica per ogni tipo di nodo, evidenziando al programmatore attraverso delle opportune `Exception` nel caso di un errore semantico.
+E' stata effettuata una verifica per ogni tipo di nodo, evidenziando al programmatore l'errore semantico attraverso delle opportune `Exception`.
+
+La gestione dello scoping è stato gestito attraverso una struttura stack modellata dalla classe `TableStack`.
+Espone l'interfacce per l'aggiunta ed eliminazione di una tabella all'interno dello stack. 
+
+Ovviamente, la classe fornisce anche una interfaccia che permette di effettuare una `lookUp` all'interno delle tabelle presenti nello stack.
+
+Ogni tabella di scooping é formata nel seguente modo.
+
+ID | SYBOL | TYPE | TYPEINPUT | TYPEINPUT | KIND
+--- | --- | --- |--- | --- |---
+`String` | `String` | `String` |`ArrayList<String>` | `ArrayList<String>` | `var`&#124;&#124;`proc`
+
+In base al costruttore utilizzato, la tabella riconosce automaticamente il tipo di costrutto (variabile o procedura).
+
+Per le procedure viene conservato l'id, il simbolo, la lista dei tipi dei parametri in input ed la lista dei tipi dei valori di ritorno.
+
+Nel caso delle variabili viene conservato l'id, il simbolo e il tipo a lei associata.
 
 Di seguito é riportata la tabella che evidenzia i vari tipi cui possono essere impiegati gli operatori.
-
-parlare dello stack.
 
 OP | ARG1 | ARG2 | RETURN 
 --- | --- | --- |--- 
