@@ -274,3 +274,16 @@ emcc pathFile.c --emrun -o pathFile.html
 # il comando emrun permette anche una serie di opzioni che consentono di selezionare un preciso browser, di determinate la durata della vita del webserver ed altre possibilità
 emrun pathFile.html
 ```
+
+## Programmi Toy creati
+- `esercizio.toy`: esercizio richiesto nell'esercitazione 4, si visualizza un menu in cui scegliere quale operazione effettuare in modo ciclico
+- `factorial.toy`: chiede un input e ne calcola il fattoriale
+- `fibonacci.toy`: chiede un intero e stampa tutti i numemri della serie di Fibonacci fino a quel intero
+- `fibonacciNoIn.toy`: stesso comportamento di fibonacci ma l'input è codificato, in tal modo si può eseguire questo programma con emscripten senza problemi
+- `functionReturn.toy`: presentazione di una caratteristica che è stata supportata, la possibilità di ritornare una funzione con tutti i controlli di tipo necessari
+- `Hanoi.toy`: cheide in input il nome di perni e risolve il gioco della torre di Hanoi con tali perni
+- `mcd.toy`: calcola il massimo comun divisore di due numeri dati in input
+- `multAddDiff.toy`: calcola il prodotto, la somma e la differenza di due numeri dati in input
+- `numeriPrimi.toy`: dato un numero in input ci dice se il numero è primo o meno
+- `numeriPrimiArgv.toy`: stesso comportamento di numeriPrimi ma in questo caso l'input viene dato da riga di comando quando si avvia il programma (presente quindi in argv)
+- `sqrt.toy`: dato un numero ne restituisce la radice quadrata
