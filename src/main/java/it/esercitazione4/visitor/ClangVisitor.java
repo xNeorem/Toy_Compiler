@@ -581,11 +581,11 @@ public class ClangVisitor implements Visitor{
           types += ClangVisitor.ioConst.get(type.equals("char*") ? "string" : type);
         }
       } else {
-        params += (String) exprNode.accept(this) + ", ";
+        params += (String) exprNode.accept(this) + ",";
         types += ClangVisitor.ioConst.get(exprNode.getType());
       }
     }
-    params = params.substring(0, params.length()-2);
+    params = params.substring(0, params.length()-1);
 
     code += String.format("printf(\"%s\", %s);", types, params);
     if(temp_param != null) code += "free("+temp_param+");";

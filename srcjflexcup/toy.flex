@@ -52,6 +52,7 @@ id = [{letter}][{letter}|{digit}]*
     "-" { return new Symbol(sym.MINUS); }
     "*" { return new Symbol(sym.TIMES); }
     "/" { return new Symbol(sym.DIV); }
+    "," { return new Symbol(sym.COMMA); }
     {id} { return new Symbol(sym.ID, yytext()); }
     {digits} { return new Symbol(sym.INT_CONST, Integer.parseInt(yytext())); }
     {number} { return new Symbol(sym.FLOAT_CONST, Double.parseDouble(yytext())); }
@@ -59,7 +60,6 @@ id = [{letter}][{letter}|{digit}]*
     "(" { return new Symbol(sym.LPAR); }
     ")" { return new Symbol(sym.RPAR); }
     ":" { return new Symbol(sym.COLON); }
-    "," { return new Symbol(sym.COMMA); }
     ";" { return new Symbol(sym.SEMI); }
     "=" { return new Symbol(sym.EQ); }
     "<>" { return new Symbol(sym.NE); }
