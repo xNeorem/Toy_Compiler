@@ -1,9 +1,14 @@
-proc test1(int a,b)int, int:
-    -> a, b
+proc test() int,int:
+  -> 1, 1
+corp;
+
+proc test1(int a,b) int,int,int,string,int:
+    -> 1 ,test(), "CIAO",3
 corp;
 
 proc main()void:
-    int a := test1(1, 2);
+    int a,b;
+    a,b := test1(1, 2);
     write(a);
     ->
 corp;

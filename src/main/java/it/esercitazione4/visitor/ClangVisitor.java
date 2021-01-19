@@ -319,18 +319,20 @@ public class ClangVisitor implements Visitor{
 
     else if(returnsCall.size() > 1){
       ArrayList<ExprNode> exprNodes = node.getReturnExprsNode().getExprListNode().getExprListNode();
-      for (int i = 0; i < returnsCall.size(); i++){
-        if(exprNodes.get(i).getName().equals(Node.CALL_PROC_OP) &&
-            Arrays.asList(((CallProcNode) exprNodes.get(i).getValue1()).getType().split(", ")).size() > 1){
+      int exprCount = 0,i = 0;
+      while (i < returnsCall.size()){
 
-          CallProcNode callProcNode = (CallProcNode) exprNodes.get(i).getValue1();
+        if(exprNodes.get(exprCount).getName().equals(Node.CALL_PROC_OP) &&
+            Arrays.asList(((CallProcNode) exprNodes.get(exprCount).getValue1()).getType().split(", ")).size() > 1){
+
+          CallProcNode callProcNode = (CallProcNode) exprNodes.get(exprCount).getValue1();
           ArrayList<String> callProcReturns = new ArrayList<String>(
               Arrays.asList(callProcNode.getType().split(", ")));
 
           String tempCallProc = ClangVisitor.generateTempVariable();
           code += "void** "+tempCallProc + " = "+callProcNode.accept(this)+";";
 
-          for(int j = 0; j <callProcReturns.size(); j++){
+          for(int j = 0; j < callProcReturns.size(); j++){
             String tempVar = ClangVisitor.generateTempVariable();
             String type = callProcReturns.get(j);
             if(type.equals("string"))
@@ -343,15 +345,20 @@ public class ClangVisitor implements Visitor{
 
           code += "free("+tempCallProc+");";
         }
-        else if(exprNodes.get(i).getName().equals(Node.ID))
-          code += temp_param+"["+i+"]"+" = &"+exprNodes.get(i).accept(this)+";";
+        else if(exprNodes.get(exprCount).getName().equals(Node.ID)){
+          code += temp_param+"["+i+"]"+" = &"+exprNodes.get(exprCount).accept(this)+";";
+          i++;
+        }
         else{
           String new_temp = ClangVisitor.generateTempVariable();
-          String expr_code = (String) exprNodes.get(i).accept(this);
+          String expr_code = (String) exprNodes.get(exprCount).accept(this);
 
           code += returnsCall.get(i)+" "+new_temp+" = "+expr_code+";";
           code += temp_param+"["+i+"]"+" = &"+new_temp+";";
+          i++;
         }
+
+        exprCount++;
 
       }
       code += "return "+temp_param+";";
@@ -485,7 +492,7 @@ public class ClangVisitor implements Visitor{
   @Override
   public Object visit(TypeDeclNode node) throws Exception {
     if(node.getValue().equals("string"))
-      return "char*";
+      return "char* ";
     return node.getValue() + " ";
   }
 

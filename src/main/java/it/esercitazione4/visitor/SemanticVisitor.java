@@ -367,22 +367,38 @@ public class SemanticVisitor implements Visitor{
       node.getReturnExprsNode().accept(this);
       ArrayList<ExprNode> exprNodes = node.getReturnExprsNode().getExprListNode().getExprListNode();
 
-      /*if(exprNodes.size() != returns.size())
-        throw new ReturnParamsException(node.getIdLeaf().getValue());*/
-      for (int j = 0; j < exprNodes.size(); j++){
-        ExprNode expr = exprNodes.get(j);
+      if(exprNodes.size() > returns.size())
+        throw new ReturnParamsException(node.getIdLeaf().getValue());
+
+      int j = 0 , exprCount = 0;
+      while (j < returns.size()){
+
+        if(exprCount > exprNodes.size() - 1)
+          throw new ReturnParamsException(node.getIdLeaf().getValue());
+
+        ExprNode expr = exprNodes.get(exprCount);
+
         if(expr.getName().equals(Node.CALL_PROC_OP)){
-          CallProcNode callProcNode = (CallProcNode) exprNodes.get(j).getValue1();
+
+          CallProcNode callProcNode = (CallProcNode) expr.getValue1();
           ArrayList<String> returnsCall = new ArrayList<String>(
               Arrays.asList(callProcNode.getType().split(", ")));
+
           for(String returnCall : returnsCall){
             if(!returnCall.equals(returns.get(j)))
               throw new ReturnParamsException(node.getIdLeaf().getValue());
             j++;
           }
+
+          exprCount++;
         }
-        else if(!returns.get(j).equals(expr.getType()))
-          throw new ReturnParamsException(node.getIdLeaf().getValue());
+        else{ //idleaf
+          if( !returns.get(j).equals(expr.getType()))
+            throw new ReturnParamsException(node.getIdLeaf().getValue());
+          exprCount++;
+          j++;
+        }
+
       }
     }else{
       if(size != 1 || !resultTypeNodes.get(0).isVoid())
@@ -510,6 +526,8 @@ public class SemanticVisitor implements Visitor{
           TableStack.getHead().addToTable(idLeaves.get(0).getValue(),type);
           idLeaves.get(0).accept(this);
           exprNodes.get(0).accept(this);
+          if(exprNodes.get(0).getName().equals(Node.CALL_PROC_OP) && Arrays.asList(exprNodes.get(0).getType().split(", ")).size() > 1)
+            throw new TypeMismatchException();
           if(!exprNodes.get(0).getType().contains(idLeaves.get(0).getType()))
             throw new TypeMismatchException();
         }
