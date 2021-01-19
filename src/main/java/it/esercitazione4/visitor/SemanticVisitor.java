@@ -334,7 +334,7 @@ public class SemanticVisitor implements Visitor{
 
     //CHECK deve esistere un solo void come parametro di ritorno.
     int i = 0;
-    if(size == 1 && resultTypeNodes.get(i).isVoid()){
+    if(size == 1 && resultTypeNodes.get(i).isVoid() && node.getReturnExprsNode() == null){
       returns.add("void");
       i++;
     }
@@ -386,7 +386,7 @@ public class SemanticVisitor implements Visitor{
       }
     }else{
       if(size != 1 || !resultTypeNodes.get(0).isVoid())
-        throw new Exception("test");
+        throw new ReturnParamsException(node.getIdLeaf().getValue());
     }
 
     //System.out.println(node.getIdLeaf().getValue());

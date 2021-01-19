@@ -1,5 +1,9 @@
-proc main()int,void,void:
-    int a;
-    a := 5;
+proc test1(int a,b)int, int:
+    -> a, b
+corp;
+
+proc main()void:
+    int a := test1(1, 2);
+    write(a);
     ->
 corp;
