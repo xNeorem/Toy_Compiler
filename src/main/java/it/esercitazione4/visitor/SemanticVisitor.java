@@ -384,6 +384,8 @@ public class SemanticVisitor implements Visitor{
           ArrayList<String> returnsCall = new ArrayList<String>(
               Arrays.asList(callProcNode.getType().split(", ")));
 
+          if(returnsCall.size() + j > returns.size())
+            throw new ReturnParamsException(node.getIdLeaf().getValue());
           for(String returnCall : returnsCall){
             if(!returnCall.equals(returns.get(j)))
               throw new ReturnParamsException(node.getIdLeaf().getValue());
