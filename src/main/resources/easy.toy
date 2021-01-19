@@ -1,8 +1,17 @@
 proc test()int, int:
-    -> 9, 1
+    -> 9,1
 corp;
 
+proc test2()string,int:
+  -> "nuel",80
+corp;
+
+proc test1()int,int,int,string,string,int:
+  ->1,test(),"emma",test2()
+corp;
+
+
 proc main()void:
-    test();
+    write(test1());
     ->
 corp;

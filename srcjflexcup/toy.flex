@@ -15,10 +15,12 @@ import java_cup.runtime.Symbol;
   }
 %}
 
-separator = [ \r\n\t\f]
+separator = \r|\n|\r\n | [ \t\f]
+
 digit = [0-9]
-digits = {digit}+
-number = {digits}(.{digits})?(E[+-]?{digits})?
+NoZeroNumber = [1-9]
+digits = ({NoZeroNumber}{digit}*|0)
+number = ({NoZeroNumber}{digit}*|0)(\.({digit}*{NoZeroNumber}+|0))
 letter = [A-Za-z]
 id = [{letter}][{letter}|{digit}]*
 
