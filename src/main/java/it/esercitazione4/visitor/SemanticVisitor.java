@@ -384,6 +384,9 @@ public class SemanticVisitor implements Visitor{
         else if(!returns.get(j).equals(expr.getType()))
           throw new ReturnParamsException(node.getIdLeaf().getValue());
       }
+    }else{
+      if(size != 1 || !resultTypeNodes.get(0).isVoid())
+        throw new Exception("test");
     }
 
     //System.out.println(node.getIdLeaf().getValue());
