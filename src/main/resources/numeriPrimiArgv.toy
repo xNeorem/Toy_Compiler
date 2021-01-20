@@ -11,15 +11,7 @@ proc primo(int x)bool:
     -> primo
 corp;
 
-proc test(bool y; string nome)int,int,int:
-    int a:=1,b:=2,c:=3;
-    if y && nome="MICHELE" then write(nome);
-    fi;
-    -> a, b, c
-corp;
-
-proc main(int x; bool y)void:
-    test(y, "MICHELE");
+proc main(int x)void:
     if primo(x) then write(x, " è un numero primo\n");
     else write(x, " non è un numero primo\n");
     fi;

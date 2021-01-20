@@ -1,17 +1,16 @@
-proc test()int, int:
-    -> 9,1
+proc test2()float, bool:
+    -> 9.1,true
 corp;
 
-proc test2()string,int:
-  -> "nuel",80
+proc test1()int, int:
+    -> 9,2
 corp;
 
-proc test1()int,int,int,string,string,int:
-  ->1,test(),"emma",test2()
+proc test()int, int, int, string, int, float, bool:
+    -> 1,test1(),"CIAO",10,test2()
 corp;
-
 
 proc main()void:
-    write(test1());
+    write(test());
     ->
 corp;
