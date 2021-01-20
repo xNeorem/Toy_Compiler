@@ -11,6 +11,9 @@ proc test()int, int, int, string, int, float, bool:
 corp;
 
 proc main()void:
+    int a,b;
+    a,b := test1();
+    write("a = ",a," b = ",b,"\n");
     write(test());
     ->
 corp;

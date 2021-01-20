@@ -305,7 +305,7 @@ public class ClangVisitor implements Visitor{
       //code += "void *array["+returnsCall.size()+"];";
       code += "    void **"+temp_param+" = (void **)malloc(sizeof(void *) * "+returnsCall.size()+");"
           + "     if ("+temp_param+" == NULL) {"
-          + "        printf(\"Memory not allocated for return values.\");"
+          + "        printf(\"Memory not allocated for return values in "+ functionName+".\");"
           + "        exit(0);"
           + "    }";
 
