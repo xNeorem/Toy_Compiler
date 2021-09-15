@@ -10,6 +10,18 @@ proc fibonacci(int n)int:
     -> toReturn
 corp;
 
+proc fibonacci(int n)int:
+    int toReturn := 0;
+    if n = 0 then
+        toReturn := 0;
+    elif n = 1 then
+        toReturn := 1;
+    else
+        toReturn := fibonacci(n-1) + fibonacci(n-2);
+    fi;
+    -> toReturn
+corp;
+
 proc main()void:
     int i := 0;
     int n;

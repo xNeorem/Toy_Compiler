@@ -12,6 +12,7 @@ corp;
 
 proc main()void:
     int a,b;
+    int a;
     a,b := test1();
     write("a = ",a," b = ",b,"\n");
     write(test());

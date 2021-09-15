@@ -1,5 +1,6 @@
 package it.esercitazione4.visitor;
 
+import it.esercitazione4.exceptions.AlreadyDeclaredException;
 import it.esercitazione4.exceptions.CallProcException;
 import it.esercitazione4.exceptions.ReturnParamsException;
 import it.esercitazione4.exceptions.TypeMismatchException;
@@ -322,6 +323,9 @@ public class SemanticVisitor implements Visitor{
     ArrayList<String> params = new ArrayList<>();
     ArrayList<String> returns = new ArrayList<>();
 
+    if(TableStack.lookUp(node.getIdLeaf().getValue()) != null)
+      throw new AlreadyDeclaredException(node.getIdLeaf().getValue());
+
     if(node.getParamDeclListNode() != null)
       for(ParDeclNode parDeclNode : node.getParamDeclListNode().getParamDeclListNode()){
         String type = parDeclNode.getTypeDeclNode().getValue();
@@ -517,6 +521,9 @@ public class SemanticVisitor implements Visitor{
     for(Object obj : node.getIdListInitNode().getIdListInitNode()){
 
       if( obj instanceof IdLeaf){
+        if(TableStack.lookUp(((IdLeaf) obj).getValue()) != null)
+          throw new AlreadyDeclaredException(((IdLeaf) obj).getValue());
+
         TableStack.getHead().addToTable(((IdLeaf) obj).getValue(),type);
         ((IdLeaf) obj).accept(this);
       }
@@ -525,6 +532,10 @@ public class SemanticVisitor implements Visitor{
         ArrayList<ExprNode> exprNodes = ((AssignStatNode) obj).getExprListNode().getExprListNode();
 
         if(idLeaves.size() == 1 && exprNodes.size() == 1){
+
+          if(TableStack.lookUp(idLeaves.get(0).getValue()) != null)
+            throw new AlreadyDeclaredException(idLeaves.get(0).getValue());
+
           TableStack.getHead().addToTable(idLeaves.get(0).getValue(),type);
           idLeaves.get(0).accept(this);
           exprNodes.get(0).accept(this);

@@ -13,6 +13,7 @@ corp;
 
 proc main()void:
     int x;
+    int x;
     write("Inserire il numero da controllare: \n");
     readln(x);
     if primo(x) then write(x, " è un numero primo\n");
